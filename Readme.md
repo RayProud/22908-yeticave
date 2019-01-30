@@ -1,7 +1,7 @@
 # Личный проект «YetiCave»
 
 * Студент: [Роман Прудников](https://up.htmlacademy.ru/php/8/user/22908).
-* Наставник: `Неизвестно`.
+* Наставник: [Олег Скляров](https://htmlacademy.ru/profile/id926687). 
 
 ---
 
