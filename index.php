@@ -12,6 +12,20 @@ $lots = [
     ["title" => "Маска Oakley Canopy", "category" => "Разное", "price" => 5400, "image" => "img/lot-6.jpg"]
 ];
 
+/**
+ * Format a price in Russian notation and append a RUR symbol
+ *
+ * @param $price
+ *
+ * @return float|string
+ */
+function format_price($price) {
+    $ceiled_price = ceil($price);
+    $formated_price = $ceiled_price < 1000 ? $ceiled_price : number_format($ceiled_price, 0, '.', ' ');
+
+    return $formated_price ." <b class='rub'>р</b>";
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -85,7 +99,7 @@ $lots = [
                         <div class="lot__state">
                             <div class="lot__rate">
                                 <span class="lot__amount">Стартовая цена</span>
-                                <span class="lot__cost"><?=$value["price"]; ?><b class="rub">р</b></span>
+                                <span class="lot__cost"><?=format_price($value["price"]); ?></span>
                             </div>
                             <div class="lot__timer timer">
                                 12:23
