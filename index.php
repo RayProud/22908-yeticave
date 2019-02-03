@@ -9,21 +9,20 @@ $lots = [
     ['title' => 'Крепления Union Contact Pro 2015 года размер L/XL', 'category' => 'Крепления', 'price' => 8000, 'image' => 'img/lot-3.jpg'],
     ['title' => 'Ботинки для сноуборда DC Mutiny Charocal', 'category' => 'Ботинки', 'price' => 10999, 'image' => 'img/lot-4.jpg'],
     ['title' => 'Куртка для сноуборда DC Mutiny Charocal', 'category' => 'Одежда', 'price' => 7500, 'image' => 'img/lot-5.jpg'],
-    ['title' => 'Маска Oakley Canopy', 'category' => 'Разное', 'price' => 5400,g 'image' => 'img/lot-6.jpg']
+    ['title' => 'Маска Oakley Canopy', 'category' => 'Разное', 'price' => 5400, 'image' => 'img/lot-6.jpg']
 ];
 
 /**
  * Format a price in Russian notation and append a RUR symbol
  *
- * @param $price
+ * @param int $price
  *
- * @return float|string
+ * @return string
  */
-function format_price($price) {
-    $ceiled_price = ceil($price);
-    $formated_price = $ceiled_price < 1000 ? $ceiled_price : number_format($ceiled_price, 0, '.', ' ');
+function format_price(int $price): string {
+    $formatted_price = number_format($price, 0, '.', ' ');
 
-    return $formated_price ." <b class='rub'>р</b>";
+    return $formatted_price . ' <b class="rub">р</b>';
 }
 
 ?>
