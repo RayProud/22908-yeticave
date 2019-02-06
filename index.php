@@ -1,5 +1,6 @@
 <?php
 require_once('./functions.php');
+date_default_timezone_set('Europe/Moscow');
 $is_auth = rand(0, 1);
 
 $user_name = 'Роман Прудников';
@@ -15,7 +16,8 @@ $lots = [
 
 $content = include_template('index.php', [
     'categories' => $categories,
-    'lots' => $lots
+    'lots' => $lots,
+    'timer' => get_time_till_midnight()
 ]);
 
 $layout = include_template('layout.php', [
