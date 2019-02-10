@@ -22,6 +22,7 @@ CREATE TABLE user (
 );
 
 CREATE INDEX user_name on user(name);
+CREATE INDEX user_email on user(email);
 
 CREATE TABLE lot (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,9 +30,9 @@ CREATE TABLE lot (
   title CHAR(128) NOT NULL,
   description TEXT(1024) NOT NULL,
   image_url CHAR(255) NOT NULL,
-  start_price DECIMAL NOT NULL,
+  start_price DECIMAL UNSIGNED NOT NULL,
   end_at DATETIME NOT NULL,
-  bet_step DECIMAL NOT NULL,
+  bet_step INT UNSIGNED NOT NULL,
   author_id INT NOT NULL,
   winner_id INT,
   category_id INT NOT NULL,
@@ -45,7 +46,7 @@ CREATE INDEX lot_title on lot(title);
 CREATE TABLE bet (
   id INT AUTO_INCREMENT PRIMARY KEY,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  amount DECIMAL NOT NULL,
+  amount INT UNSIGNED NOT NULL,
   author_id INT NOT NULL,
   lot_id INT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user(id),
