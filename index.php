@@ -1,18 +1,50 @@
 <?php
 require_once('./functions.php');
+require_once('./mysql_helper.php');
 date_default_timezone_set('Europe/Moscow');
 $is_auth = rand(0, 1);
 
 $user_name = 'Роман Прудников';
-$categories = ['Доски и лыжи', 'Крепления', 'Ботинки', 'Одежда', 'Инструменты', 'Разное'];
-$lots = [
-    ['title' => '2014 Rossignol District Snowboard', 'category' => 'Доски и лыжи', 'price' => 10999.2, 'image' => 'img/lot-1.jpg'],
-    ['title' => 'DC Ply Mens 2016/2017 Snowboard', 'category' => 'Доски и лыжи', 'price' => 159999.99, 'image' => 'img/lot-2.jpg'],
-    ['title' => 'Крепления Union Contact Pro 2015 года размер L/XL', 'category' => 'Крепления', 'price' => 8000, 'image' => 'img/lot-3.jpg'],
-    ['title' => 'Ботинки для сноуборда DC Mutiny Charocal', 'category' => 'Ботинки', 'price' => 10999.0, 'image' => 'img/lot-4.jpg'],
-    ['title' => 'Куртка для сноуборда DC Mutiny Charocal', 'category' => 'Одежда', 'price' => 7500.0, 'image' => 'img/lot-5.jpg'],
-    ['title' => 'Маска Oakley Canopy', 'category' => 'Разное', 'price' => 5400.0, 'image' => 'img/lot-6.jpg']
-];
+
+$link = mysqli_init();
+
+if (!$link) {
+    die('Error link');
+}
+
+if (!mysqli_options($link, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1)) {
+    die('Error mysqli_options');
+}
+
+if (!mysqli_real_connect($link, '127.0.0.1', 'root', '', 'yeticave')) {
+    die('A db connection error occured: ' . mysqli_connect_error());
+}
+
+mysqli_set_charset($link, "utf8");
+
+$get_newest_lots_query = 'SELECT l.title, l.start_price, l.image_url, c.title AS category_title
+FROM lot l
+       JOIN category c
+            ON l.category_id=c.id
+WHERE l.end_at >= NOW()
+ORDER BY l.created_at DESC;';
+$response = mysqli_query($link, $get_newest_lots_query);
+
+if ($response === false) {
+    die('A query error occured: ' . mysqli_error($link));
+}
+
+$lots = mysqli_fetch_all($response, MYSQLI_ASSOC);
+
+$get_categories_query = 'SELECT title FROM category';
+
+$response = mysqli_query($link, $get_categories_query);
+
+if ($response === false) {
+    die('A query error occured: ' . mysqli_error($link));
+}
+
+$categories = array_column(mysqli_fetch_all($response, MYSQLI_ASSOC), 'title');
 
 $content = include_template('index.php', [
     'categories' => $categories,

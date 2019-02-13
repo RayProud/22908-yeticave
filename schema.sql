@@ -30,7 +30,7 @@ CREATE TABLE lot (
   title CHAR(128) NOT NULL,
   description TEXT(1024) NOT NULL,
   image_url CHAR(255) NOT NULL,
-  start_price DECIMAL UNSIGNED NOT NULL,
+  start_price FLOAT UNSIGNED NOT NULL,
   end_at DATETIME NOT NULL,
   bet_step INT UNSIGNED NOT NULL,
   author_id INT NOT NULL,
