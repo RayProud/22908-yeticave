@@ -43,3 +43,37 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
 
     return $stmt;
 }
+
+function get_lots($link) {
+    $get_newest_lots_query = 'SELECT l.title, l.start_price, l.image_url, c.title AS category_title
+        FROM lot l
+               JOIN category c
+                    ON l.category_id=c.id
+        WHERE l.end_at >= NOW()
+        ORDER BY l.created_at DESC;';
+
+    $stmt = db_get_prepare_stmt($link, $get_newest_lots_query);
+    mysqli_stmt_execute($stmt);
+    $response = mysqli_stmt_get_result($stmt);
+
+    if ($response === false) {
+        die('A query error occured: ' . mysqli_error($link));
+    }
+
+    return mysqli_fetch_all($response, MYSQLI_ASSOC);
+}
+
+function get_categories($link) {
+    $get_categories_query = 'SELECT title FROM category';
+
+    $stmt = db_get_prepare_stmt($link, $get_categories_query);
+    mysqli_stmt_execute($stmt);
+    $response = mysqli_stmt_get_result($stmt);
+
+    if ($response === false) {
+        die('A query error occured: ' . mysqli_error($link));
+    }
+
+    return array_column(mysqli_fetch_all($response, MYSQLI_ASSOC), 'title');
+}
+
