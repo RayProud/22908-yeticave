@@ -6,21 +6,7 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Роман Прудников';
 
-$link = mysqli_init();
-
-if (!$link) {
-    die('Error link');
-}
-
-if (!mysqli_options($link, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1)) {
-    die('Error mysqli_options');
-}
-
-if (!mysqli_real_connect($link, '127.0.0.1', 'root', '', 'yeticave')) {
-    die('A db connection error occured: ' . mysqli_connect_error());
-}
-
-mysqli_set_charset($link, "utf8");
+$link = get_connection();
 
 $lots = get_lots($link);
 $categories = get_categories($link);
