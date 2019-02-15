@@ -50,3 +50,28 @@ function get_time_till_midnight(): string {
 
     return date_interval_format(date_diff($now_date, $tomorrow_midnight_date), '%H:%I');
 }
+
+/**
+ * Connect to a db and configure connection settings
+ *
+ * @return mysqli
+ */
+function get_connection() {
+    $link = mysqli_init();
+
+    if (!$link) {
+        die('Error link');
+    }
+
+    if (!mysqli_options($link, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1)) {
+        die('Error mysqli_options');
+    }
+
+    if (!mysqli_real_connect($link, '127.0.0.1', 'root', '', 'yeticave')) {
+        die('A db connection error occured: ' . mysqli_connect_error());
+    }
+
+    mysqli_set_charset($link, "utf8");
+
+    return $link;
+}
