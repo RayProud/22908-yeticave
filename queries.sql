@@ -30,7 +30,7 @@ VALUES(11000,2,1),
 SELECT * FROM category;
 
 -- Get newest lots
-SELECT l.title, l.start_price, l.image_url, c.title AS category_title
+SELECT l.created_at, l.description, l.title, l.start_price, l.image_url, c.title AS category_title
 FROM lot l
        JOIN category c
             ON l.category_id=c.id
