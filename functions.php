@@ -9,7 +9,7 @@
  *
  * @return string HTML including data from passed $data
  */
-function include_template(string $name, array $data): string {
+function include_template(string $name, array $data = []): string {
     $name = 'templates/' . $name;
     $result = '';
 
@@ -49,6 +49,21 @@ function get_time_till_midnight(): string {
     $tomorrow_midnight_date = date_create('tomorrow midnight');
 
     return date_interval_format(date_diff($now_date, $tomorrow_midnight_date), '%H:%I');
+}
+
+/**
+ * Returns null if the date's in the past or returns days, hours and minutes till a given date
+ *
+ * @return string|null
+ */
+function get_time_till_date(string $end_date): ?string {
+    $now_date = date_create();
+    $end_date = date_create($end_date);
+
+    return $now_date > $end_date
+        ? null
+        : date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I');
+
 }
 
 /**

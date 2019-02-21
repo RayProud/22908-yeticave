@@ -44,36 +44,87 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
     return $stmt;
 }
 
-function get_lots($link) {
-    $get_newest_lots_query = 'SELECT l.title, l.start_price, l.image_url, c.title AS category_title
+/**
+ * Делает запрос в базу, обрабывает все ошибки и возвращает массив данных, если он есть
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $query SQL запрос с плейсхолдерами вместо значений
+ * @param mixed ...$data данные для execute_statement
+ *
+ * @return array|null
+ */
+function execute_statement($link, string $query, ...$data): ?array {
+    $stmt = db_get_prepare_stmt($link, $query, ...$data);
+    $execution = mysqli_stmt_execute($stmt);
+
+    if ($execution === false) {
+        die('A statement execution error occured: ' . mysqli_error($link));
+    }
+
+    $response = mysqli_stmt_get_result($stmt);
+
+    if ($response === false) {
+        die('A query error occured: ' . mysqli_error($link));
+    }
+
+    if (mysqli_num_rows($response) === 0) {
+        return null;
+    }
+
+    return mysqli_fetch_all($response, MYSQLI_ASSOC);
+}
+
+
+/**
+ * Делает запрос за лотом по его ID
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $lot_id int ID искомого лота
+ *
+ * @return array|null
+ */
+function get_lot($link, int $lot_id): ?array {
+    $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title
+        FROM lot l
+               JOIN category c
+                    ON l.category_id=c.id
+        WHERE l.id = ?;';
+
+    $response = execute_statement($link, $get_lot_query, [$lot_id]);
+
+    return $response ? $response[0] : $response;
+}
+
+/**
+ * Делает запрос за всеми актуальными лотами
+ *
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return array|null
+ */
+function get_all_lots($link): ?array {
+    $get_newest_lots_query = 'SELECT l.id, l.title, l.start_price, l.image_url, c.title AS category_title
         FROM lot l
                JOIN category c
                     ON l.category_id=c.id
         WHERE l.end_at >= NOW()
         ORDER BY l.created_at DESC;';
 
-    $stmt = db_get_prepare_stmt($link, $get_newest_lots_query);
-    mysqli_stmt_execute($stmt);
-    $response = mysqli_stmt_get_result($stmt);
-
-    if ($response === false) {
-        die('A query error occured: ' . mysqli_error($link));
-    }
-
-    return mysqli_fetch_all($response, MYSQLI_ASSOC);
+    return execute_statement($link, $get_newest_lots_query);
 }
 
-function get_categories($link) {
+/**
+ * Делает запрос за всеми категориями
+ *
+ * @param $link mysqli Ресурс соединения
+ *
+ * @return array|null
+ */
+function get_categories($link): ?array {
     $get_categories_query = 'SELECT title FROM category';
 
-    $stmt = db_get_prepare_stmt($link, $get_categories_query);
-    mysqli_stmt_execute($stmt);
-    $response = mysqli_stmt_get_result($stmt);
+    $response = execute_statement($link, $get_categories_query);
 
-    if ($response === false) {
-        die('A query error occured: ' . mysqli_error($link));
-    }
-
-    return array_column(mysqli_fetch_all($response, MYSQLI_ASSOC), 'title');
+    return $response ? array_column($response, 'title') : $response;
 }
 

@@ -8,14 +8,24 @@ $user_name = 'Роман Прудников';
 
 $link = get_connection();
 
-$lots = get_lots($link);
 $categories = get_categories($link);
 
-$content = include_template('index.php', [
-    'categories' => $categories,
-    'lots' => $lots,
-    'timer' => get_time_till_midnight()
-]);
+if(isset($_GET['lot'])) {
+    $lot_id = (int) $_GET['lot'];
+    $lot = get_lot($link, $lot_id);
+
+    $content = $lot === null
+        ? include_template('404.php')
+        : include_template('lot.php', ['lot' => $lot]);
+} else {
+    $lots = get_all_lots($link);
+
+    $content = include_template('index.php', [
+        'categories' => $categories,
+        'lots' => $lots,
+        'timer' => get_time_till_midnight()
+    ]);
+}
 
 $layout = include_template('layout.php', [
     'title' => 'Главная',
