@@ -60,11 +60,10 @@ function get_time_till_date(string $end_date): ?string {
     $now_date = date_create();
     $end_date = date_create($end_date);
 
-    if (date_interval_format(date_diff($now_date, $end_date), '%r') === '-') {
-        return null;
-    }
+    return $now_date > $end_date
+        ? null
+        : date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I');
 
-    return date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I');
 }
 
 /**

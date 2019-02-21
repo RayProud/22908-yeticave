@@ -84,10 +84,6 @@ function execute_statement($link, string $query, ...$data): ?array {
  * @return array|null
  */
 function get_lot($link, int $lot_id): ?array {
-    if (!is_int($lot_id)) {
-        return null;
-    }
-
     $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title
         FROM lot l
                JOIN category c

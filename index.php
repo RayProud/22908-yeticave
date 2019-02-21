@@ -16,9 +16,7 @@ if(isset($_GET['lot'])) {
 
     $content = $lot === null
         ? include_template('404.php')
-        : include_template('lot.php', [
-        'lot' => $lot
-    ]);
+        : include_template('lot.php', ['lot' => $lot]);
 } else {
     $lots = get_all_lots($link);
 
