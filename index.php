@@ -10,7 +10,7 @@ $link = get_connection();
 
 $categories = get_categories($link);
 
-if(isset($_GET['lot'])) {
+if (isset($_GET['lot'])) {
     $lot_id = (int) $_GET['lot'];
     $lot = get_lot($link, $lot_id);
 
