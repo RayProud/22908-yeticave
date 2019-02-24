@@ -74,7 +74,7 @@ function get_time_till_date(string $end_date): ?string {
  * @return bool
  */
 function not_empty($value): bool {
-    return !empty($value);
+    return $value !== null;
 }
 
 /**
@@ -115,6 +115,19 @@ function is_date_correct_and_later_than_current_day($value): bool {
     return $lot_date > $now && date_interval_format(date_diff($lot_date, $now), "%d") >= 1;
 }
 
+
+function has_image(): bool {
+    $file = $_FILES['lot-photo'];
+
+    return !!$file['size'];
+}
+
+function has_correct_mime_type(): bool {
+    $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
+
+    return in_array($_FILES['lot-photo']['type'], $allowed_image_types);
+}
+
 /**
  * Check POST data from add-lot page
  *
@@ -131,10 +144,10 @@ function validate_lot(): array {
         'message' => [
             'not_empty' => 'Напишите описание лота'
         ],
-//    'lot-photo' => [
-//        'has_image' => 'Добавьте изображение',
-//        'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
-//    ],
+        'lot-photo' => [
+            'has_image' => 'Добавьте изображение',
+            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
+        ],
         'lot-rate' => [
             'not_empty' => 'Введите начальную цену',
             'is_positive_number' => 'Начальная цена должна быть числом больше нуля',
@@ -152,7 +165,7 @@ function validate_lot(): array {
     $found_errors = [];
 
     foreach ($lot_rules as $form_name => $tests) {
-        $current_value = $_POST[$form_name];
+        $current_value = isset($_POST[$form_name]) ? $_POST[$form_name] : null;
         $found_errors[$form_name] = [];
 
         foreach ($tests as $validate_func => $error_msg) {
@@ -163,6 +176,8 @@ function validate_lot(): array {
 
         if (count($found_errors[$form_name]) === 0) {
             unset($found_errors[$form_name]);
+        } else {
+            $found_errors[$form_name] = implode('; ', $found_errors[$form_name]);
         }
     }
 

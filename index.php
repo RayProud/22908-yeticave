@@ -8,7 +8,9 @@ $user_name = 'Роман Прудников';
 
 $link = get_connection();
 
-$categories = get_categories($link);
+$full_categories = get_categories($link);
+
+$categories = array_column($full_categories, 'title');
 
 if (isset($_GET['lot'])) {
     $lot_id = (int) $_GET['lot'];
