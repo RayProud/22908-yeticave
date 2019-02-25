@@ -1,16 +1,7 @@
 <?php
-require_once('./functions.php');
-require_once('./mysql_helper.php');
-date_default_timezone_set('Europe/Moscow');
-$is_auth = rand(0, 1);
+require_once('./init.php');
 
-$user_name = 'Роман Прудников';
-
-$link = get_connection();
-
-$categories = get_categories($link);
-
-if(isset($_GET['lot'])) {
+if (isset($_GET['lot'])) {
     $lot_id = (int) $_GET['lot'];
     $lot = get_lot($link, $lot_id);
 
@@ -36,4 +27,3 @@ $layout = include_template('layout.php', [
 ]);
 
 print($layout);
-

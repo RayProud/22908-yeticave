@@ -1,6 +1,31 @@
 <?php
 
 /**
+ * Connect to a db and configure connection settings
+ *
+ * @return mysqli
+ */
+function get_connection() {
+    $link = mysqli_init();
+
+    if (!$link) {
+        die('Error link');
+    }
+
+    if (!mysqli_options($link, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1)) {
+        die('Error mysqli_options');
+    }
+
+    if (!mysqli_real_connect($link, '127.0.0.1', 'root', '', 'yeticave')) {
+        die('A db connection error occured: ' . mysqli_connect_error());
+    }
+
+    mysqli_set_charset($link, "utf8");
+
+    return $link;
+}
+
+/**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
  *
  * @param $link mysqli Ресурс соединения
@@ -121,10 +146,32 @@ function get_all_lots($link): ?array {
  * @return array|null
  */
 function get_categories($link): ?array {
-    $get_categories_query = 'SELECT title FROM category';
+    $get_categories_query = 'SELECT title, id FROM category';
 
     $response = execute_statement($link, $get_categories_query);
 
-    return $response ? array_column($response, 'title') : $response;
+    return $response;
 }
 
+/**
+ * Сохраняет лот
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $lot array Лот
+ *
+ * @return array|null
+ */
+function save_lot($link, array $lot): ?int {
+    $get_categories_query = 'INSERT INTO lot (title,description,image_url,start_price,end_at,bet_step,author_id,category_id) VALUES(?,?,?,?,?,?,?,?)';
+
+    $stmt = db_get_prepare_stmt($link, $get_categories_query, array_values($lot));
+    $execution = mysqli_stmt_execute($stmt);
+
+    if ($execution === false) {
+        die('A statement execution error occured: ' . mysqli_error($link));
+    }
+
+    mysqli_stmt_get_result($stmt);
+
+    return mysqli_insert_id($link);
+}

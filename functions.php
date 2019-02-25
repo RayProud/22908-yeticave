@@ -67,26 +67,136 @@ function get_time_till_date(string $end_date): ?string {
 }
 
 /**
- * Connect to a db and configure connection settings
+ * Checks if a value is not empty
  *
- * @return mysqli
+ * @param any $value
+ *
+ * @return bool
  */
-function get_connection() {
-    $link = mysqli_init();
+function not_null($value): bool {
+    return $value !== null;
+}
 
-    if (!$link) {
-        die('Error link');
+/**
+ * Checks if a value is a positive number
+ *
+ * @param any $value
+ *
+ * @return bool
+ */
+function is_positive_number($value): bool {
+    return is_numeric($value) && $value > 0;
+}
+
+/**
+ * Checks if a value is a positive integer number
+ *
+ * @param any $value
+ *
+ * @return bool
+ */
+function is_positive_int($value): bool {
+    $converted_value = (int) $value;
+
+    return is_int($converted_value) && $converted_value > 0;
+}
+
+/**
+ * Checks if a value can be converted to a date and the date is more than one day ahead of now
+ *
+ * @param any $value
+ *
+ * @return bool
+ */
+function is_date_correct_and_later_than_current_day($value): bool {
+    $now = date_create('today');
+    $lot_date = date_create($value);
+
+    return $lot_date > $now && date_interval_format(date_diff($lot_date, $now), "%d") >= 1;
+}
+
+/**
+ * Checks if there is a file with a given field name
+ *
+ * @param any $_
+ *
+ * @param string $photo_field_name
+ *
+ * @return bool
+ */
+function has_image($_, string $photo_field_name): bool {
+    $file = $_FILES[$photo_field_name];
+
+    return !!$file['size'];
+}
+
+/**
+ * Checks if a file's mime-type is allowed
+ *
+ * @param $_
+ *
+ * @param string $photo_field_name
+ *
+ * @return bool
+ */
+function has_correct_mime_type($_, string $photo_field_name): bool {
+    $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
+
+    return in_array($_FILES[$photo_field_name]['type'], $allowed_image_types, true);
+}
+
+/**
+ * Check POST data from add-lot page
+ *
+ * @return array
+ */
+function validate_lot(): array {
+    $lot_rules = [
+        'lot-name' => [
+            'not_null' => 'Введите наименование лота'
+        ],
+        'category' => [
+            'not_null' => 'Выберите категорию'
+        ],
+        'message' => [
+            'not_null' => 'Напишите описание лота'
+        ],
+        'lot-photo' => [
+            'has_image' => 'Добавьте изображение',
+            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
+        ],
+        'lot-rate' => [
+            'not_null' => 'Введите начальную цену',
+            'is_positive_number' => 'Начальная цена должна быть числом больше нуля',
+        ],
+        'lot-step' => [
+            'not_null' => 'Введите шаг ставки',
+            'is_positive_int' => 'Шаг ставки должен быть целым числом больше ноля',
+        ],
+        'lot-date' => [
+            'not_null' => 'Введите дату завершения торгов',
+            'is_date_correct_and_later_than_current_day' => 'Дата завершения должна быть больше текущей даты, хотя бы на один день',
+        ]
+    ];
+
+    $found_errors = [];
+
+    foreach ($lot_rules as $form_name => $tests) {
+        $current_value = $_POST[$form_name] ?? null;
+        $found_errors[$form_name] = [];
+
+        foreach ($tests as $validate_func => $error_msg) {
+            if (!$validate_func($current_value, $form_name)) {
+                array_push($found_errors[$form_name], $error_msg);
+            }
+        }
+
+        if (count($found_errors[$form_name]) === 0) {
+            unset($found_errors[$form_name]);
+        } else {
+            $found_errors[$form_name] = implode('; ', $found_errors[$form_name]);
+        }
     }
 
-    if (!mysqli_options($link, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1)) {
-        die('Error mysqli_options');
-    }
-
-    if (!mysqli_real_connect($link, '127.0.0.1', 'root', '', 'yeticave')) {
-        die('A db connection error occured: ' . mysqli_connect_error());
-    }
-
-    mysqli_set_charset($link, "utf8");
-
-    return $link;
+    return $found_errors;
 }
