@@ -157,13 +157,14 @@ function get_categories($link): ?array {
  * Сохраняет лот
  *
  * @param $link mysqli Ресурс соединения
+ * @param $lot array Лот
  *
  * @return array|null
  */
-function save_lot($link, $title, $description, $image_url, $start_price, $end_at, $bet_step, $author_id, $category_id): ?int {
+function save_lot($link, array $lot): ?int {
     $get_categories_query = 'INSERT INTO lot (title,description,image_url,start_price,end_at,bet_step,author_id,category_id) VALUES(?,?,?,?,?,?,?,?)';
 
-    $stmt = db_get_prepare_stmt($link, $get_categories_query, [$title, $description, $image_url, $start_price, $end_at, $bet_step, $author_id, $category_id]);
+    $stmt = db_get_prepare_stmt($link, $get_categories_query, array_values($lot));
     $execution = mysqli_stmt_execute($stmt);
 
     if ($execution === false) {

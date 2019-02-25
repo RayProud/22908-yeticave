@@ -1,16 +1,5 @@
 <?php
-require_once('./functions.php');
-require_once('./mysql_helper.php');
-date_default_timezone_set('Europe/Moscow');
-$is_auth = rand(0, 1);
-
-$user_name = 'Роман Прудников';
-
-$link = get_connection();
-
-$full_categories = get_categories($link);
-
-$categories = array_column($full_categories, 'title');
+require_once('./init.php');
 
 $found_errors = [];
 
@@ -27,7 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         move_uploaded_file($_FILES['lot-photo']['tmp_name'], $file_path);
 
-        $lot_id = save_lot($link, $_POST['lot-name'], $_POST['message'], $file_path, $_POST['lot-rate'], $_POST['lot-date'], $_POST['lot-step'], 1, $_POST['category']);
+        $lot = [
+            'title' => $_POST['lot-name'],
+            'description' => $_POST['message'],
+            'image_url' => $file_path,
+            'start_price' => $_POST['lot-rate'],
+            'end_at' => $_POST['lot-date'],
+            'bet_step' => $_POST['lot-step'],
+            'author_id' => 1,
+            'category_id' => $_POST['category']
+        ];
+
+        $lot_id = save_lot($link, $lot);
 
         header('Location: /?lot=' . $lot_id);
     }

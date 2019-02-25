@@ -73,7 +73,7 @@ function get_time_till_date(string $end_date): ?string {
  *
  * @return bool
  */
-function not_empty($value): bool {
+function not_null($value): bool {
     return $value !== null;
 }
 
@@ -115,17 +115,34 @@ function is_date_correct_and_later_than_current_day($value): bool {
     return $lot_date > $now && date_interval_format(date_diff($lot_date, $now), "%d") >= 1;
 }
 
-
-function has_image(): bool {
-    $file = $_FILES['lot-photo'];
+/**
+ * Checks if there is a file with a given field name
+ *
+ * @param any $_
+ *
+ * @param string $photo_field_name
+ *
+ * @return bool
+ */
+function has_image($_, string $photo_field_name): bool {
+    $file = $_FILES[$photo_field_name];
 
     return !!$file['size'];
 }
 
-function has_correct_mime_type(): bool {
+/**
+ * Checks if a file's mime-type is allowed
+ *
+ * @param $_
+ *
+ * @param string $photo_field_name
+ *
+ * @return bool
+ */
+function has_correct_mime_type($_, string $photo_field_name): bool {
     $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
 
-    return in_array($_FILES['lot-photo']['type'], $allowed_image_types);
+    return in_array($_FILES[$photo_field_name]['type'], $allowed_image_types, true);
 }
 
 /**
@@ -136,28 +153,28 @@ function has_correct_mime_type(): bool {
 function validate_lot(): array {
     $lot_rules = [
         'lot-name' => [
-            'not_empty' => 'Введите наименование лота'
+            'not_null' => 'Введите наименование лота'
         ],
         'category' => [
-            'not_empty' => 'Выберите категорию'
+            'not_null' => 'Выберите категорию'
         ],
         'message' => [
-            'not_empty' => 'Напишите описание лота'
+            'not_null' => 'Напишите описание лота'
         ],
         'lot-photo' => [
             'has_image' => 'Добавьте изображение',
             'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
         ],
         'lot-rate' => [
-            'not_empty' => 'Введите начальную цену',
+            'not_null' => 'Введите начальную цену',
             'is_positive_number' => 'Начальная цена должна быть числом больше нуля',
         ],
         'lot-step' => [
-            'not_empty' => 'Введите шаг ставки',
+            'not_null' => 'Введите шаг ставки',
             'is_positive_int' => 'Шаг ставки должен быть целым числом больше ноля',
         ],
         'lot-date' => [
-            'not_empty' => 'Введите дату завершения торгов',
+            'not_null' => 'Введите дату завершения торгов',
             'is_date_correct_and_later_than_current_day' => 'Дата завершения должна быть больше текущей даты, хотя бы на один день',
         ]
     ];
@@ -165,11 +182,11 @@ function validate_lot(): array {
     $found_errors = [];
 
     foreach ($lot_rules as $form_name => $tests) {
-        $current_value = isset($_POST[$form_name]) ? $_POST[$form_name] : null;
+        $current_value = $_POST[$form_name] ?? null;
         $found_errors[$form_name] = [];
 
         foreach ($tests as $validate_func => $error_msg) {
-            if (!$validate_func($current_value)) {
+            if (!$validate_func($current_value, $form_name)) {
                 array_push($found_errors[$form_name], $error_msg);
             }
         }
