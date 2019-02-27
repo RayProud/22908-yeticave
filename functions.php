@@ -67,14 +67,14 @@ function get_time_till_date(string $end_date): ?string {
 }
 
 /**
- * Checks if a value is not empty
+ * Checks if a value is not null and not empty
  *
  * @param any $value
  *
  * @return bool
  */
 function not_null($value): bool {
-    return $value !== null;
+    return $value !== null && !empty($value);
 }
 
 /**
@@ -199,4 +199,72 @@ function validate_lot(): array {
     }
 
     return $found_errors;
+}
+
+/**
+ * Check POST data from sign-up page
+ *
+ * @return array
+ */
+function validate_user(): array {
+    $user_rules = [
+        'email' => [
+            'not_null' => 'Введите наименование лота',
+            'is_email' => 'Введите корректный email'
+        ],
+        'password' => [
+            'not_null' => 'Выберите категорию'
+        ],
+        'contacts' => [
+            'not_null' => 'Напишите описание лота'
+        ],
+        'image_url' => [
+            'has_image' => 'Добавьте изображение',
+            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
+            // добавить необязательность
+        ],
+        'name' => [
+            'not_null' => 'Введите начальную цену',
+            'is_positive_number' => 'Начальная цена должна быть числом больше нуля',
+        ]
+    ];
+
+    // отдельная переменная необязательных полей?
+
+    $found_errors = [];
+
+    foreach ($user_rules as $form_name => $tests) {
+        $current_value = $_POST[$form_name] ?? null;
+        $found_errors[$form_name] = [];
+
+        foreach ($tests as $validate_func => $error_msg) {
+            if (!$validate_func($current_value, $form_name)) {
+                array_push($found_errors[$form_name], $error_msg);
+            }
+        }
+
+        if (count($found_errors[$form_name]) === 0) {
+            unset($found_errors[$form_name]);
+        } else {
+            $found_errors[$form_name] = implode('; ', $found_errors[$form_name]);
+        }
+    }
+
+    return $found_errors;
+}
+
+/**
+ * Moves a files to the img folder
+ *
+ * @param string $photo_name
+ */
+function move_photo_to_img(string $photo_name) {
+    $path = $_FILES[$photo_name]['name'];
+    $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+    $filename = uniqid() . '.' . $ext;
+
+    $file_path = 'img/' . $filename;
+
+    move_uploaded_file($_FILES[$photo_name]['tmp_name'], $file_path);
 }
