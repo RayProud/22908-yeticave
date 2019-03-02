@@ -320,7 +320,7 @@ function validate_post_data(array $scheme): array {
  */
 function move_photo_to_img(string $photo_name) {
     if (!does_file_exist($photo_name)) {
-        return false;
+        return null;
     }
 
     $path = $_FILES[$photo_name]['name'];

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $user_id = save_user($link, $user);
 
-        header('Location: /login');
+        header('Location: /login.php');
     }
 }
 
