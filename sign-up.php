@@ -34,8 +34,6 @@ $content = include_template('sign-up.php', [
 
 $layout = include_template('layout.php', [
     'title' => 'Зарегистрироваться',
-    'is_auth' => $is_auth,
-    'user_name' => $user_name,
     'content' => $content,
     'categories' => $categories
 ]);

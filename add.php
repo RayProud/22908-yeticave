@@ -1,6 +1,11 @@
 <?php
 require_once('./init.php');
 
+if (!isset($_SESSION['user'])) {
+    http_response_code(403);
+    exit();
+}
+
 $found_errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,8 +47,6 @@ $content = include_template('add.php', [
 
 $layout = include_template('layout.php', [
     'title' => 'Добавить лот',
-    'is_auth' => $is_auth,
-    'user_name' => $user_name,
     'content' => $content,
     'categories' => $categories
 ]);

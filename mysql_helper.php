@@ -170,9 +170,7 @@ function get_all_lots($link): ?array {
 function get_categories($link): ?array {
     $get_categories_query = 'SELECT title, id FROM category';
 
-    $response = execute_get_statement($link, $get_categories_query);
-
-    return $response;
+    return execute_get_statement($link, $get_categories_query);
 }
 
 /**
@@ -217,4 +215,36 @@ function does_such_email_already_exist($link, string $email): bool {
     $response = execute_get_statement($link, $find_email_query, [$email]);
 
     return !!$response;
+}
+
+/**
+ * Достаёт пароль пользователя по переданному email'у
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $email
+ *
+ * @return string|null
+ */
+function get_hashed_password_by_email($link, string $email): ?string {
+    $find_email_query = 'SELECT password FROM user WHERE email = ?';
+
+    $response = execute_get_statement($link, $find_email_query, [$email]);
+
+    return isset($response[0]) ? $response[0]['password'] : $response;
+}
+
+/**
+ * Достаёт пользователя для сессии по переданному email'у
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $email
+ *
+ * @return array|null
+ */
+function get_user_by_email($link, string $email): ?array {
+    $find_user_query = 'SELECT id, email, name, image_url FROM user WHERE email = ?';
+
+    $response = execute_get_statement($link, $find_user_query, [$email]);
+
+    return $response[0] ?: $response;
 }
