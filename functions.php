@@ -168,6 +168,17 @@ function is_email_unique($value): bool {
 }
 
 /**
+ * Checks if email of a given value exists in the db
+ *
+ * @param any $value
+ *
+ * @return bool
+ */
+function does_email_exist($value): bool {
+    return does_such_email_already_exist($GLOBALS['link'], $value);
+}
+
+/**
  * Check POST data from add-lot page
  *
  * @return array
@@ -237,6 +248,36 @@ function validate_user(): array {
     ];
 
     return array_merge(validate_post_data($user_post_rules), validate_files_data($user_files_rules));
+}
+
+/**
+ * Checks POST data from login page
+ *
+ * @return array
+ */
+function validate_login(): array {
+    $user_post_rules = [
+        'email' => [
+            'not_null' => 'Введите e-mail',
+            'does_email_exist' => 'Пользователю с таким e-mail не существует',
+            'is_email_like' => 'Введите корректный email'
+        ],
+        'password' => [
+            'not_null' => 'Введите пароль'
+        ]
+    ];
+
+    if (count(validate_post_data($user_post_rules)) > 0) {
+        return validate_post_data($user_post_rules);
+    }
+
+    $found_pass = get_hashed_password_by_email($GLOBALS['link'], $_POST['email']);
+
+    if(!password_verify($_POST['password'], $found_pass)) {
+        return ['password' => 'Вы ввели неверный пароль'];
+    }
+
+    return [];
 }
 
 /**
@@ -316,7 +357,7 @@ function validate_post_data(array $scheme): array {
  *
  * @param string $photo_name
  *
- * @return bool|string
+ * @return null|string
  */
 function move_photo_to_img(string $photo_name) {
     if (!does_file_exist($photo_name)) {

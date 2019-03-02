@@ -9,7 +9,7 @@ if (isset($_GET['lot'])) {
         ? include_template('404.php')
         : include_template('lot.php', ['lot' => $lot]);
 } else {
-    $lots = get_all_lots($link);
+    $lots = get_all_lots($link) ?? [];
 
     $content = include_template('index.php', [
         'categories' => $categories,
