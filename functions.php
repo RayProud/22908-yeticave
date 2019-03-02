@@ -112,7 +112,7 @@ function is_date_correct_and_later_than_current_day($value): bool {
     $now = date_create('today');
     $lot_date = date_create($value);
 
-    return $lot_date > $now && date_interval_format(date_diff($lot_date, $now), "%d") >= 1;
+    return $lot_date > $now && date_interval_format(date_diff($lot_date, $now), "%a") >= 1;
 }
 
 /**

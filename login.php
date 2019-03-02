@@ -7,7 +7,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $found_errors = validate_login();
 
     if (!count($found_errors)) {
-        // аутентификация
+        $user = get_user_by_email($link, $_POST['email']);
+
+        $_SESSION['user'] = $user;
 
         header('Location: /');
     }
@@ -22,8 +24,6 @@ $content = include_template('login.php', [
 
 $layout = include_template('layout.php', [
     'title' => 'Войти',
-    'is_auth' => $is_auth,
-    'user_name' => $user_name,
     'content' => $content,
     'categories' => $categories
 ]);

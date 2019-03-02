@@ -232,3 +232,19 @@ function get_hashed_password_by_email($link, string $email): ?string {
 
     return isset($response[0]) ? $response[0]['password'] : $response;
 }
+
+/**
+ * Достаёт пользователя для сессии по переданному email'у
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $email
+ *
+ * @return array|null
+ */
+function get_user_by_email($link, string $email): ?array {
+    $find_user_query = 'SELECT id, email, name, image_url FROM user WHERE email = ?';
+
+    $response = execute_get_statement($link, $find_user_query, [$email]);
+
+    return $response[0] ?: $response;
+}
