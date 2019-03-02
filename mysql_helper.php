@@ -202,3 +202,19 @@ function save_user($link, array $user): ?int {
 
     return execute_insert_statement($link, $save_user_query, array_values($user));
 }
+
+/**
+ * Проверяет наличие email'а в базе
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $email
+ *
+ * @return bool
+ */
+function does_such_email_already_exist($link, string $email): bool {
+    $find_email_query = 'SELECT * FROM user WHERE email = ?';
+
+    $response = execute_get_statement($link, $find_email_query, [$email]);
+
+    return !!$response;
+}

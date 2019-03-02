@@ -20,7 +20,7 @@
                 <?php endforeach; ?>
             </select>
             <span class="form__error">
-                <?= isset($found_errors['category']) ? $found_errors['category'] : '' ?>
+                <?= $found_errors['category'] ?? '' ?>
             </span>
         </div>
     </div>
@@ -28,7 +28,7 @@
         <label for="message">Описание</label>
         <textarea id="message" name="message" placeholder="Напишите описание лота" required><?=htmlspecialchars($message);?></textarea>
         <span class="form__error">
-            <?= isset($found_errors['message']) ? $found_errors['message'] : '' ?>
+            <?= $found_errors['message'] ?? '' ?>
         </span>
     </div>
     <div class="form__item form__item--file <?php if (isset($found_errors['lot-photo'])): ?>form__item--invalid<?php endif; ?>"> <!-- form__item--uploaded -->
@@ -46,7 +46,7 @@
             </label>
         </div>
         <span class="form__error">
-            <?= isset($found_errors['lot-photo']) ? $found_errors['lot-photo'] : '' ?>
+            <?= $found_errors['lot-photo'] ?? '' ?>
         </span>
     </div>
     <div class="form__container-three">
@@ -54,21 +54,21 @@
             <label for="lot-rate">Начальная цена</label>
             <input id="lot-rate" type="number" name="lot-rate" placeholder="0" value="<?=htmlspecialchars($lot_rate);?>" required>
             <span class="form__error">
-                <?= isset($found_errors['lot-rate']) ? $found_errors['lot-rate'] : '' ?>
+                <?= $found_errors['lot-rate'] ?? '' ?>
             </span>
         </div>
         <div class="form__item form__item--small <?php if (isset($found_errors['lot-step'])): ?>form__item--invalid<?php endif; ?>">
             <label for="lot-step">Шаг ставки</label>
             <input id="lot-step" type="number" name="lot-step" placeholder="0" value="<?=htmlspecialchars($lot_step);?>" required>
             <span class="form__error">
-                <?= isset($found_errors['lot-step']) ? $found_errors['lot-step'] : '' ?>
+                <?= $found_errors['lot-step'] ?? '' ?>
             </span>
         </div>
         <div class="form__item <?php if (isset($found_errors['lot-date'])): ?>form__item--invalid<?php endif; ?>">
             <label for="lot-date">Дата окончания торгов</label>
             <input class="form__input-date" id="lot-date" type="date" name="lot-date" value="<?=htmlspecialchars($lot_date);?>" required>
             <span class="form__error">
-                <?= isset($found_errors['lot-date']) ? $found_errors['lot-date'] : '' ?>
+                <?= $found_errors['lot-date'] ?? '' ?>
             </span>
         </div>
     </div>

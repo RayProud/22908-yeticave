@@ -118,13 +118,11 @@ function is_date_correct_and_later_than_current_day($value): bool {
 /**
  * Checks if there is a file with a given field name
  *
- * @param any $_
- *
  * @param string $photo_field_name
  *
  * @return bool
  */
-function has_image($_, string $photo_field_name): bool {
+function does_file_exist(string $photo_field_name): bool {
     $file = $_FILES[$photo_field_name];
 
     return !!$file['size'];
@@ -133,16 +131,40 @@ function has_image($_, string $photo_field_name): bool {
 /**
  * Checks if a file's mime-type is allowed
  *
- * @param $_
- *
  * @param string $photo_field_name
  *
  * @return bool
  */
-function has_correct_mime_type($_, string $photo_field_name): bool {
+function has_correct_mime_type(string $photo_field_name): bool {
     $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
 
+    if (!isset($_FILES[$photo_field_name])) {
+        return false;
+    }
+
     return in_array($_FILES[$photo_field_name]['type'], $allowed_image_types, true);
+}
+
+/**
+ * Checks if a value is email-like
+ *
+ * @param any $value
+ *
+ * @return bool
+ */
+function is_email_like($value): bool {
+    return filter_var($value, FILTER_VALIDATE_EMAIL);
+}
+
+/**
+ * Checks if email of a given value doens't exist in the db
+ *
+ * @param any $value
+ *
+ * @return bool
+ */
+function is_email_unique($value): bool {
+    return !does_such_email_already_exist($GLOBALS['link'], $value);
 }
 
 /**
@@ -151,7 +173,7 @@ function has_correct_mime_type($_, string $photo_field_name): bool {
  * @return array
  */
 function validate_lot(): array {
-    $lot_rules = [
+    $lot_post_rules = [
         'lot-name' => [
             'not_null' => 'Введите наименование лота'
         ],
@@ -160,10 +182,6 @@ function validate_lot(): array {
         ],
         'message' => [
             'not_null' => 'Напишите описание лота'
-        ],
-        'lot-photo' => [
-            'has_image' => 'Добавьте изображение',
-            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
         ],
         'lot-rate' => [
             'not_null' => 'Введите начальную цену',
@@ -179,14 +197,69 @@ function validate_lot(): array {
         ]
     ];
 
+    $lot_files_rules = [
+        'lot-photo' => [
+            'does_file_exist' => 'Добавьте изображение',
+            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
+        ]
+    ];
+
+    return array_merge(validate_post_data($lot_post_rules), validate_files_data($lot_files_rules));
+}
+
+/**
+ * Checks POST data from sign-up page
+ *
+ * @return array
+ */
+function validate_user(): array {
+    $user_post_rules = [
+        'name' => [
+            'not_null' => 'Введите имя'
+        ],
+        'email' => [
+            'not_null' => 'Введите e-mail',
+            'is_email_unique' => 'Пользователь с таким e-mail уже существует',
+            'is_email_like' => 'Введите корректный email'
+        ],
+        'password' => [
+            'not_null' => 'Введите пароль'
+        ],
+        'contacts' => [
+            'not_null' => 'Напишите как с вами связаться'
+        ]
+    ];
+
+    $user_files_rules = [
+        'avatar' => [
+            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
+        ]
+    ];
+
+    return array_merge(validate_post_data($user_post_rules), validate_files_data($user_files_rules));
+}
+
+/**
+ * Checks FILES using a given scheme
+ *
+ * @param array $scheme
+ *
+ * @return array Found errors
+ */
+function validate_files_data(array $scheme): array {
     $found_errors = [];
 
-    foreach ($lot_rules as $form_name => $tests) {
-        $current_value = $_POST[$form_name] ?? null;
+    foreach ($scheme as $form_name => $tests) {
+        $is_value_optional = !does_file_exist($form_name) && !in_array('does_file_exist', $tests, true);
+
+        if ($is_value_optional) {
+            continue;
+        }
+
         $found_errors[$form_name] = [];
 
         foreach ($tests as $validate_func => $error_msg) {
-            if (!$validate_func($current_value, $form_name)) {
+            if (!$validate_func($form_name)) {
                 array_push($found_errors[$form_name], $error_msg);
             }
         }
@@ -202,43 +275,28 @@ function validate_lot(): array {
 }
 
 /**
- * Check POST data from sign-up page
+ * Checks POST data using a given scheme
  *
- * @return array
+ * @param array $scheme
+ *
+ * @return array Found errors
  */
-function validate_user(): array {
-    $user_rules = [
-        'email' => [
-            'not_null' => 'Введите наименование лота',
-            'is_email' => 'Введите корректный email'
-        ],
-        'password' => [
-            'not_null' => 'Выберите категорию'
-        ],
-        'contacts' => [
-            'not_null' => 'Напишите описание лота'
-        ],
-        'image_url' => [
-            'has_image' => 'Добавьте изображение',
-            'has_correct_mime_type' => 'Допустимые форматы файлов: jpg, jpeg, png'
-            // добавить необязательность
-        ],
-        'name' => [
-            'not_null' => 'Введите начальную цену',
-            'is_positive_number' => 'Начальная цена должна быть числом больше нуля',
-        ]
-    ];
-
-    // отдельная переменная необязательных полей?
-
+function validate_post_data(array $scheme): array {
     $found_errors = [];
 
-    foreach ($user_rules as $form_name => $tests) {
+    foreach ($scheme as $form_name => $tests) {
         $current_value = $_POST[$form_name] ?? null;
+
+        $is_value_optional = !not_null($current_value) && !in_array('not_null', $tests, true);
+
+        if ($is_value_optional) {
+            continue;
+        }
+
         $found_errors[$form_name] = [];
 
         foreach ($tests as $validate_func => $error_msg) {
-            if (!$validate_func($current_value, $form_name)) {
+            if (!$validate_func($current_value)) {
                 array_push($found_errors[$form_name], $error_msg);
             }
         }
@@ -257,8 +315,14 @@ function validate_user(): array {
  * Moves a files to the img folder
  *
  * @param string $photo_name
+ *
+ * @return bool|string
  */
 function move_photo_to_img(string $photo_name) {
+    if (!does_file_exist($photo_name)) {
+        return false;
+    }
+
     $path = $_FILES[$photo_name]['name'];
     $ext = pathinfo($path, PATHINFO_EXTENSION);
 
@@ -267,4 +331,6 @@ function move_photo_to_img(string $photo_name) {
     $file_path = 'img/' . $filename;
 
     move_uploaded_file($_FILES[$photo_name]['tmp_name'], $file_path);
+
+    return $file_path;
 }

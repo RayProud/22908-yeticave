@@ -7,12 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $found_errors = validate_lot();
 
     if (!count($found_errors)) {
-        move_photo_to_img('lot-photo');
+        $file_path = move_photo_to_img('lot-photo');
 
         $lot = [
             'title' => $_POST['lot-name'],
             'description' => $_POST['message'],
-            'image_url' => $file_path,
+            'image_url' => $file_path ?? '',
             'start_price' => $_POST['lot-rate'],
             'end_at' => $_POST['lot-date'],
             'bet_step' => $_POST['lot-step'],

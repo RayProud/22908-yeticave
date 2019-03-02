@@ -16,7 +16,7 @@ CREATE TABLE user (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   email CHAR(255) UNIQUE NOT NULL,
   name CHAR(255) NOT NULL,
-  password CHAR(32) NOT NULL,
+  password CHAR(255) NOT NULL,
   image_url CHAR(255),
   contacts TEXT(1024) NOT NULL
 );
