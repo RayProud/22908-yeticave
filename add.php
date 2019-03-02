@@ -7,19 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $found_errors = validate_lot();
 
     if (!count($found_errors)) {
-        $path = $_FILES['lot-photo']['name'];
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-
-        $filename = uniqid() . '.' . $ext;
-
-        $file_path = 'img/' . $filename;
-
-        move_uploaded_file($_FILES['lot-photo']['tmp_name'], $file_path);
+        $file_path = move_photo_to_img('lot-photo');
 
         $lot = [
             'title' => $_POST['lot-name'],
             'description' => $_POST['message'],
-            'image_url' => $file_path,
+            'image_url' => $file_path ?? '',
             'start_price' => $_POST['lot-rate'],
             'end_at' => $_POST['lot-date'],
             'bet_step' => $_POST['lot-step'],
@@ -33,9 +26,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$have_errors = count($found_errors) > 0;
+
 $content = include_template('add.php', [
     'categories' => $full_categories,
-    'found_errors' => $found_errors
+    'found_errors' => $found_errors,
+    'have_errors' => $have_errors,
+    'lot_name' => $_POST['lot-name'] ?? '',
+    'message' => $_POST['message'] ?? '',
+    'lot_rate' => $_POST['lot-rate'] ?? '',
+    'lot_date' => $_POST['lot-date'] ?? '',
+    'lot_step' => $_POST['lot-step'] ?? '',
+    'lot_category' => $_POST['category'] ?? ''
 ]);
 
 $layout = include_template('layout.php', [

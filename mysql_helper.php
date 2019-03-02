@@ -70,7 +70,7 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
 }
 
 /**
- * Делает запрос в базу, обрабывает все ошибки и возвращает массив данных, если он есть
+ * Делает запрос в базу на поиск данных, обрабывает все ошибки и возвращает массив данных, если он есть
  *
  * @param $link mysqli Ресурс соединения
  * @param string $query SQL запрос с плейсхолдерами вместо значений
@@ -78,7 +78,7 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
  *
  * @return array|null
  */
-function execute_statement($link, string $query, ...$data): ?array {
+function execute_get_statement($link, string $query, ...$data): ?array {
     $stmt = db_get_prepare_stmt($link, $query, ...$data);
     $execution = mysqli_stmt_execute($stmt);
 
@@ -99,6 +99,28 @@ function execute_statement($link, string $query, ...$data): ?array {
     return mysqli_fetch_all($response, MYSQLI_ASSOC);
 }
 
+/**
+ * Делает запрос в базу для добавления данных, обрабывает все ошибки и id сделанной записи
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $query SQL запрос с плейсхолдерами вместо значений
+ * @param mixed ...$data данные для execute_statement
+ *
+ * @return int|null
+ */
+function execute_insert_statement($link, string $query, ?array $data): ?int {
+    $stmt = db_get_prepare_stmt($link, $query, $data);
+    $execution = mysqli_stmt_execute($stmt);
+
+    if ($execution === false) {
+        die('A statement execution error occured: ' . mysqli_error($link));
+    }
+
+    mysqli_stmt_get_result($stmt);
+
+    return mysqli_insert_id($link);
+}
+
 
 /**
  * Делает запрос за лотом по его ID
@@ -115,7 +137,7 @@ function get_lot($link, int $lot_id): ?array {
                     ON l.category_id=c.id
         WHERE l.id = ?;';
 
-    $response = execute_statement($link, $get_lot_query, [$lot_id]);
+    $response = execute_get_statement($link, $get_lot_query, [$lot_id]);
 
     return $response ? $response[0] : $response;
 }
@@ -135,7 +157,7 @@ function get_all_lots($link): ?array {
         WHERE l.end_at >= NOW()
         ORDER BY l.created_at DESC;';
 
-    return execute_statement($link, $get_newest_lots_query);
+    return execute_get_statement($link, $get_newest_lots_query);
 }
 
 /**
@@ -148,7 +170,7 @@ function get_all_lots($link): ?array {
 function get_categories($link): ?array {
     $get_categories_query = 'SELECT title, id FROM category';
 
-    $response = execute_statement($link, $get_categories_query);
+    $response = execute_get_statement($link, $get_categories_query);
 
     return $response;
 }
@@ -162,16 +184,37 @@ function get_categories($link): ?array {
  * @return array|null
  */
 function save_lot($link, array $lot): ?int {
-    $get_categories_query = 'INSERT INTO lot (title,description,image_url,start_price,end_at,bet_step,author_id,category_id) VALUES(?,?,?,?,?,?,?,?)';
+    $save_lot_query = 'INSERT INTO lot (title,description,image_url,start_price,end_at,bet_step,author_id,category_id) VALUES(?,?,?,?,?,?,?,?)';
 
-    $stmt = db_get_prepare_stmt($link, $get_categories_query, array_values($lot));
-    $execution = mysqli_stmt_execute($stmt);
+    return execute_insert_statement($link, $save_lot_query, array_values($lot));
+}
 
-    if ($execution === false) {
-        die('A statement execution error occured: ' . mysqli_error($link));
-    }
+/**
+ * Сохраняет пользователя
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $user array Пользователь
+ *
+ * @return array|null
+ */
+function save_user($link, array $user): ?int {
+    $save_user_query = 'INSERT INTO user (email,name,password,image_url,contacts) VALUES(?,?,?,?,?)';
 
-    mysqli_stmt_get_result($stmt);
+    return execute_insert_statement($link, $save_user_query, array_values($user));
+}
 
-    return mysqli_insert_id($link);
+/**
+ * Проверяет наличие email'а в базе
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $email
+ *
+ * @return bool
+ */
+function does_such_email_already_exist($link, string $email): bool {
+    $find_email_query = 'SELECT * FROM user WHERE email = ?';
+
+    $response = execute_get_statement($link, $find_email_query, [$email]);
+
+    return !!$response;
 }
