@@ -54,6 +54,8 @@ function get_time_till_midnight(): string {
 /**
  * Returns null if the date's in the past or returns days, hours and minutes till a given date
  *
+ * @param string $end_date
+ *
  * @return string|null
  */
 function get_time_till_date(string $end_date): ?string {
@@ -64,6 +66,20 @@ function get_time_till_date(string $end_date): ?string {
         ? null
         : date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I');
 
+}
+
+/**
+ * Returns human format time from now
+ *
+ * @param string $date
+ *
+ * @return string
+ */
+function get_time_time_from_now(string $date): string {
+    $now_date = date_create();
+    $end_date = date_create($date);
+
+    return date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I назад');
 }
 
 /**
@@ -176,6 +192,34 @@ function is_email_unique($value): bool {
  */
 function does_email_exist($value): bool {
     return does_such_email_already_exist($GLOBALS['link'], $value);
+}
+
+/**
+ * Check POST bet data from lot page
+ *
+ * @param $lot
+ *
+ * @return array
+ */
+function validate_bet(array $lot): array {
+    $bet_post_rules = [
+        'cost' => [
+            'not_null' => 'Введите ставку',
+            'is_positive_int' => 'Ставка должна быть целым положительным числом'
+        ]
+    ];
+
+    if (count(validate_post_data($bet_post_rules)) > 0) {
+        return validate_post_data($bet_post_rules);
+    }
+
+    $minimum_bet = $lot["start_price"] + $lot["bet_step"];
+
+    if ($_POST['cost'] < $minimum_bet) {
+        return ['cost' => 'Ставка должна быть больше суммы цены и минимальной ставки'];
+    }
+
+    return [];
 }
 
 /**

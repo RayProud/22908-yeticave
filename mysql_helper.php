@@ -121,7 +121,6 @@ function execute_insert_statement($link, string $query, ?array $data): ?int {
     return mysqli_insert_id($link);
 }
 
-
 /**
  * Делает запрос за лотом по его ID
  *
@@ -140,6 +139,27 @@ function get_lot($link, int $lot_id): ?array {
     $response = execute_get_statement($link, $get_lot_query, [$lot_id]);
 
     return $response ? $response[0] : $response;
+}
+
+/**
+ * Делает запрос за ставками по ID лота
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $lot_id int ID искомого лота
+ *
+ * @return array|null
+ */
+function get_bets($link, int $lot_id): ?array {
+    $get_bets_query = 'SELECT b.created_at, b.amount, u.name
+        FROM lot l
+               JOIN bet b
+                    ON b.lot_id=l.id
+               JOIN user u
+                    ON b.author_id=u.id
+        WHERE l.id = ?
+        ORDER BY b.created_at DESC;';
+
+    return execute_get_statement($link, $get_bets_query, [$lot_id]);
 }
 
 /**
@@ -188,6 +208,34 @@ function save_lot($link, array $lot): ?int {
 }
 
 /**
+ * Сохраняет ставку
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $bet array Ставка
+ *
+ * @return array|null
+ */
+function save_bet($link, array $bet): ?int {
+    $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
+
+    return execute_insert_statement($link, $save_bet_query, array_values($bet));
+}
+
+/**
+ * Меняет цену лота
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $lot array Ставка
+ *
+ * @return array|null
+ */
+function update_price($link, array $lot): ?int {
+    $update_price_query = 'UPDATE lot l SET start_price=? WHERE l.id = ?;';
+
+    return execute_insert_statement($link, $update_price_query, array_values($lot));
+}
+
+/**
  * Сохраняет пользователя
  *
  * @param $link mysqli Ресурс соединения
@@ -230,7 +278,7 @@ function get_hashed_password_by_email($link, string $email): ?string {
 
     $response = execute_get_statement($link, $find_email_query, [$email]);
 
-    return isset($response[0]) ? $response[0]['password'] : $response;
+    return $response[0]['password'] ?? $response;
 }
 
 /**
