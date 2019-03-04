@@ -213,7 +213,9 @@ function validate_bet(array $lot): array {
         return validate_post_data($bet_post_rules);
     }
 
-    $minimum_bet = $lot["start_price"] + $lot["bet_step"];
+    $highest_price = $lot["price"] ?? $lot["start_price"];
+
+    $minimum_bet = $highest_price + $lot["bet_step"];
 
     if ($_POST['cost'] < $minimum_bet) {
         return ['cost' => 'Ставка должна быть больше суммы цены и минимальной ставки'];

@@ -110,6 +110,7 @@ function execute_get_statement($link, string $query, ...$data): ?array {
  */
 function execute_insert_statement($link, string $query, ?array $data): ?int {
     $stmt = db_get_prepare_stmt($link, $query, $data);
+
     $execution = mysqli_stmt_execute($stmt);
 
     if ($execution === false) {
@@ -130,13 +131,13 @@ function execute_insert_statement($link, string $query, ?array $data): ?int {
  * @return array|null
  */
 function get_lot($link, int $lot_id): ?array {
-    $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title
+    $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title, (SELECT MAX(amount) FROM bet b WHERE b.lot_id = ?) as price
         FROM lot l
                JOIN category c
                     ON l.category_id=c.id
         WHERE l.id = ?;';
 
-    $response = execute_get_statement($link, $get_lot_query, [$lot_id]);
+    $response = execute_get_statement($link, $get_lot_query, [$lot_id, $lot_id]);
 
     return $response ? $response[0] : $response;
 }
@@ -212,27 +213,32 @@ function save_lot($link, array $lot): ?int {
  *
  * @param $link mysqli Ресурс соединения
  * @param $bet array Ставка
+ * @param $lot_id int Id лота
  *
  * @return array|null
  */
-function save_bet($link, array $bet): ?int {
+function save_bet($link, array $bet, int $lot_id): ?int {
+    mysqli_begin_transaction($link, MYSQLI_TRANS_START_READ_WRITE);
+
+//    $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
+//    $res1 = execute_insert_statement($link, $save_bet_query, array_values($bet));
+
     $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
+    $res1 = execute_insert_statement($link, $save_bet_query, array_values($bet));
 
-    return execute_insert_statement($link, $save_bet_query, array_values($bet));
-}
+    $find_new_price_query = 'SELECT MAX(amount) as max FROM bet WHERE bet.lot_id=?';
+    $res2 = execute_get_statement($link, $find_new_price_query, [$lot_id]);
 
-/**
- * Меняет цену лота
- *
- * @param $link mysqli Ресурс соединения
- * @param $lot array Ставка
- *
- * @return array|null
- */
-function update_price($link, array $lot): ?int {
-    $update_price_query = 'UPDATE lot l SET start_price=? WHERE l.id = ?;';
+    $max = array_column($res2, 'max')[0] ?? null;
 
-    return execute_insert_statement($link, $update_price_query, array_values($lot));
+    if ($res1 && $res2 && mysqli_commit($link)) {
+        return $max;
+    }
+
+    mysqli_rollback($link);
+
+    die("Transaction commit failed");
+
 }
 
 /**

@@ -169,7 +169,8 @@ main.container {
 }
 
 .main-header__logo {
-  display: block;
+  display: flex;
+  flex: 1;
   margin-right: 30px;
 }
 
