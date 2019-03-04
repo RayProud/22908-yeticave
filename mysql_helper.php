@@ -110,7 +110,6 @@ function execute_get_statement($link, string $query, ...$data): ?array {
  */
 function execute_insert_statement($link, string $query, ?array $data): ?int {
     $stmt = db_get_prepare_stmt($link, $query, $data);
-
     $execution = mysqli_stmt_execute($stmt);
 
     if ($execution === false) {
@@ -122,6 +121,7 @@ function execute_insert_statement($link, string $query, ?array $data): ?int {
     return mysqli_insert_id($link);
 }
 
+
 /**
  * Делает запрос за лотом по его ID
  *
@@ -131,36 +131,15 @@ function execute_insert_statement($link, string $query, ?array $data): ?int {
  * @return array|null
  */
 function get_lot($link, int $lot_id): ?array {
-    $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title, (SELECT MAX(amount) FROM bet b WHERE b.lot_id = ?) as price
+    $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title
         FROM lot l
                JOIN category c
                     ON l.category_id=c.id
         WHERE l.id = ?;';
 
-    $response = execute_get_statement($link, $get_lot_query, [$lot_id, $lot_id]);
+    $response = execute_get_statement($link, $get_lot_query, [$lot_id]);
 
     return $response ? $response[0] : $response;
-}
-
-/**
- * Делает запрос за ставками по ID лота
- *
- * @param $link mysqli Ресурс соединения
- * @param $lot_id int ID искомого лота
- *
- * @return array|null
- */
-function get_bets($link, int $lot_id): ?array {
-    $get_bets_query = 'SELECT b.created_at, b.amount, u.name
-        FROM lot l
-               JOIN bet b
-                    ON b.lot_id=l.id
-               JOIN user u
-                    ON b.author_id=u.id
-        WHERE l.id = ?
-        ORDER BY b.created_at DESC;';
-
-    return execute_get_statement($link, $get_bets_query, [$lot_id]);
 }
 
 /**
@@ -209,39 +188,6 @@ function save_lot($link, array $lot): ?int {
 }
 
 /**
- * Сохраняет ставку
- *
- * @param $link mysqli Ресурс соединения
- * @param $bet array Ставка
- * @param $lot_id int Id лота
- *
- * @return array|null
- */
-function save_bet($link, array $bet, int $lot_id): ?int {
-    mysqli_begin_transaction($link, MYSQLI_TRANS_START_READ_WRITE);
-
-//    $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
-//    $res1 = execute_insert_statement($link, $save_bet_query, array_values($bet));
-
-    $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
-    $res1 = execute_insert_statement($link, $save_bet_query, array_values($bet));
-
-    $find_new_price_query = 'SELECT MAX(amount) as max FROM bet WHERE bet.lot_id=?';
-    $res2 = execute_get_statement($link, $find_new_price_query, [$lot_id]);
-
-    $max = array_column($res2, 'max')[0] ?? null;
-
-    if ($res1 && $res2 && mysqli_commit($link)) {
-        return $max;
-    }
-
-    mysqli_rollback($link);
-
-    die("Transaction commit failed");
-
-}
-
-/**
  * Сохраняет пользователя
  *
  * @param $link mysqli Ресурс соединения
@@ -284,7 +230,7 @@ function get_hashed_password_by_email($link, string $email): ?string {
 
     $response = execute_get_statement($link, $find_email_query, [$email]);
 
-    return $response[0]['password'] ?? $response;
+    return isset($response[0]) ? $response[0]['password'] : $response;
 }
 
 /**

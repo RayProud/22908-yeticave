@@ -10,12 +10,12 @@ VALUES('qwer@email.com','Sam Methews','sammethews11','https://vignette.wikia.noc
 
 -- Add existing lots
 INSERT INTO lot (title,description,image_url,start_price,end_at,bet_step,author_id,category_id)
-VALUES('2014 Rossignol District Snowboard','Cool stuff!','img/lot-1.jpg',10999.2,'2019-03-22 00:00:00',10,1,1),
-('DC Ply Mens 2016/2017 Snowboard','Outstanding board!11','img/lot-2.jpg',159999.99,'2019-03-23 00:00:00',20,1,1),
-('Крепления Union Contact Pro 2015 года размер L/XL','Хорошие крепления','img/lot-3.jpg',8000.0,'2019-03-24 00:00:00',20,2,2),
-('Ботинки для сноуборда DC Mutiny Charocal','Ботинки для тех, кому не очень без ботинок','img/lot-4.jpg',10999.0,'2019-03-25 00:00:00',45,3,3),
-('Куртка для сноуборда DC Mutiny Charocal','Куртка для любителей курток','img/lot-5.jpg',7500.0,'2019-03-19 00:00:00',45,3,4),
-('Маска Oakley Canopy','Маска просто огонь, честно','img/lot-6.jpg',10999.0,'2019-03-25 00:00:00',45,4,6);
+VALUES('2014 Rossignol District Snowboard','Cool stuff!','img/lot-1.jpg',10999.2,'2019-02-22 00:00:00',10,1,1),
+('DC Ply Mens 2016/2017 Snowboard','Outstanding board!11','img/lot-2.jpg',159999.99,'2019-02-23 00:00:00',20,1,1),
+('Крепления Union Contact Pro 2015 года размер L/XL','Хорошие крепления','img/lot-3.jpg',8000.0,'2019-02-24 00:00:00',20,2,2),
+('Ботинки для сноуборда DC Mutiny Charocal','Ботинки для тех, кому не очень без ботинок','img/lot-4.jpg',10999.0,'2019-02-25 00:00:00',45,3,3),
+('Куртка для сноуборда DC Mutiny Charocal','Куртка для любителей курток','img/lot-5.jpg',7500.0,'2019-02-19 00:00:00',45,3,4),
+('Маска Oakley Canopy','Маска просто огонь, честно','img/lot-6.jpg',10999.0,'2019-02-25 00:00:00',45,4,6);
 
 -- Add some bets
 INSERT INTO bet (amount,author_id,lot_id)
