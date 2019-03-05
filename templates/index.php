@@ -28,7 +28,7 @@
                                 <span class="lot__amount">Стартовая цена</span>
                                 <span class="lot__cost"><?=format_price($lot["start_price"]); ?></span>
                             </div>
-                            <div class="lot__timer timer"><?=$timer; ?></div>
+                            <div class="lot__timer timer"><?='через ' . get_human_time_from_now($lot['end_at']); ?></div>
                         </div>
                     </div>
                 </li>

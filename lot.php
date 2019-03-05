@@ -8,7 +8,7 @@ if (!isset($_GET['lot']) || !is_numeric($_GET['lot'])) {
     $layout = include_template('layout.php', [
         'title' => $title,
         'content' => $content,
-        'categories' => $categories
+        'categories' => $full_categories
     ]);
 
     print($layout);
@@ -56,7 +56,7 @@ $title = $lot === null
 $layout = include_template('layout.php', [
     'title' => $title,
     'content' => $content,
-    'categories' => $categories
+    'categories' => $full_categories
 ]);
 
 print($layout);

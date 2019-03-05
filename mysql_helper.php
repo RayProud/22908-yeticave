@@ -171,7 +171,7 @@ function get_bets($link, int $lot_id): ?array {
  * @return array|null
  */
 function get_all_lots($link): ?array {
-    $get_newest_lots_query = 'SELECT l.id, l.title, l.start_price, l.image_url, c.title AS category_title
+    $get_newest_lots_query = 'SELECT l.id, l.title, l.start_price, l.image_url, l.end_at, c.title AS category_title
         FROM lot l
                JOIN category c
                     ON l.category_id=c.id
@@ -179,6 +179,22 @@ function get_all_lots($link): ?array {
         ORDER BY l.created_at DESC;';
 
     return execute_get_statement($link, $get_newest_lots_query);
+}
+
+/**
+ * Делает запрос за лотами по категории
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param int $category_id Категория
+ *
+ * @return array|null
+ */
+function get_category_lots($link, int $category_id): ?array {
+    $get_lots_query = 'SELECT l.id, l.title, l.start_price, l.image_url, l.end_at FROM lot l
+        WHERE l.category_id=? AND l.end_at >= NOW()
+        ORDER BY l.created_at DESC;';
+
+    return execute_get_statement($link, $get_lots_query, [$category_id]);
 }
 
 /**
@@ -220,9 +236,6 @@ function save_lot($link, array $lot): ?int {
 function save_bet($link, array $bet, int $lot_id): ?int {
     mysqli_begin_transaction($link, MYSQLI_TRANS_START_READ_WRITE);
 
-//    $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
-//    $res1 = execute_insert_statement($link, $save_bet_query, array_values($bet));
-
     $save_bet_query = 'INSERT INTO bet (amount,author_id,lot_id) VALUES(?,?,?)';
     $res1 = execute_insert_statement($link, $save_bet_query, array_values($bet));
 
@@ -238,7 +251,6 @@ function save_bet($link, array $bet, int $lot_id): ?int {
     mysqli_rollback($link);
 
     die("Transaction commit failed");
-
 }
 
 /**

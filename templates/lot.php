@@ -45,7 +45,7 @@
                             <tr class="history__item">
                                 <td class="history__name"><?=htmlspecialchars($bet['name']); ?></td>
                                 <td class="history__price"><?=format_price($bet['amount']); ?></td>
-                                <td class="history__time"><?=get_time_time_from_now($bet['created_at']); ?></td>
+                                <td class="history__time"><?=get_human_time_from_now($bet['created_at']) . 'назад'; ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </table>
