@@ -37,6 +37,10 @@ function get_connection() {
 function db_get_prepare_stmt($link, $sql, $data = []) {
     $stmt = mysqli_prepare($link, $sql);
 
+    if ($stmt === false) {
+        die(mysqli_error($link));
+    }
+
     if ($data) {
         $types = '';
         $stmt_data = [];
@@ -135,9 +139,10 @@ function get_lot($link, int $lot_id): ?array {
         FROM lot l
             JOIN category c
               ON l.category_id=c.id
-            JOIN bet b
-              ON b.lot_id=l.id
-        WHERE l.id=?;';
+            LEFT JOIN bet b
+              ON l.id=b.lot_id
+        WHERE l.id=?
+        GROUP BY l.id;';
 
     $response = execute_get_statement($link, $get_lot_query, [$lot_id]);
 
