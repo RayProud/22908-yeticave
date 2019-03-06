@@ -408,7 +408,7 @@ function validate_files_data(array $scheme): array {
     $found_errors = [];
 
     foreach ($scheme as $form_name => $tests) {
-        $is_value_optional = !does_file_exist($form_name) && !in_array('does_file_exist', $tests, true);
+        $is_value_optional = !does_file_exist($form_name) && !in_array('does_file_exist', array_keys($tests), true);
 
         if ($is_value_optional) {
             continue;
