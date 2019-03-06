@@ -34,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user'])) {
             'lot_id' => $lot_id
         ];
 
-        $max_bet = save_bet($link, $bet, $lot_id);
+        save_bet($link, $bet);
+        $max_bet = get_max_bet($link, $lot_id);
         $lot_page_data['price'] = $max_bet;
     }
 }
