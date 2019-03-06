@@ -4,7 +4,7 @@ require_once('./init.php');
 $lots = get_all_lots($link) ?? [];
 
 $content = include_template('index.php', [
-    'categories' => $categories,
+    'categories' => $full_categories,
     'lots' => $lots
 ]);
 

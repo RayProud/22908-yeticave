@@ -39,13 +39,13 @@
             <?php endif; ?>
             <?php if (count($bets) > 0): ?>
                 <div class="history">
-                    <h3>История ставок (<span>10</span>)</h3>
+                    <h3>История ставок (<span><?=count($bets); ?></span>)</h3>
                     <table class="history__list">
                         <?php foreach ($bets as $bet): ?>
                             <tr class="history__item">
                                 <td class="history__name"><?=htmlspecialchars($bet['name']); ?></td>
                                 <td class="history__price"><?=format_price($bet['amount']); ?></td>
-                                <td class="history__time"><?=get_human_time_from_now($bet['created_at']) . 'назад'; ?></td>
+                                <td class="history__time"><?=get_human_time_from_now($bet['created_at']) . ' назад'; ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </table>
