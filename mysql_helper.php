@@ -135,7 +135,7 @@ function execute_insert_statement($link, string $query, ?array $data): ?int {
  * @return array|null
  */
 function get_lot($link, int $lot_id): ?array {
-    $get_lot_query = 'SELECT l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title, IF(MAX(b.amount) IS NOT NULL, MAX(b.amount), l.start_price) AS price
+    $get_lot_query = 'SELECT l.author_id, l.description, l.end_at, l.bet_step, l.id, l.title, l.start_price, l.image_url, c.title AS category_title, IF(MAX(b.amount) IS NOT NULL, MAX(b.amount), l.start_price) AS price
         FROM lot l
             JOIN category c
               ON l.category_id=c.id

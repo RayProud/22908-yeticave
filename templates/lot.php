@@ -9,7 +9,7 @@
           <p class="lot-item__description"><?=htmlspecialchars($lot["description"]); ?></p>
         </div>
         <div class="lot-item__right">
-            <?php if(isset($_SESSION['user']) && get_time_till_date($lot["end_at"]) !== null): ?>
+            <?php if(isset($_SESSION['user']) && !$is_yours && get_time_till_date($lot["end_at"]) !== null): ?>
                 <div class="lot-item__state">
                     <?php if (get_time_till_date($lot["end_at"]) !== null): ?>
                         <div class="lot-item__timer timer">

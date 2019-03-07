@@ -17,8 +17,12 @@ if (!isset($_GET['lot']) || !is_numeric($_GET['lot'])) {
 
 $lot_id = (int) $_GET['lot'];
 $lot = get_lot($link, $lot_id);
+
+$user_id = $_SESSION['user']['id'] ?? null;
+
 $lot_page_data = [
     'lot' => $lot,
+    'is_yours' => $lot['author_id'] === $user_id,
     'price' => $lot['price'] ?? $lot['start_price']
 ];
 
