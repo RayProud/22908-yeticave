@@ -8,7 +8,7 @@ if (!isset($_GET['lot']) || !is_numeric($_GET['lot'])) {
     $layout = include_template('layout.php', [
         'title' => $title,
         'content' => $content,
-        'categories' => $categories
+        'categories' => $full_categories
     ]);
 
     print($layout);
@@ -17,8 +17,12 @@ if (!isset($_GET['lot']) || !is_numeric($_GET['lot'])) {
 
 $lot_id = (int) $_GET['lot'];
 $lot = get_lot($link, $lot_id);
+
+$user_id = $_SESSION['user']['id'] ?? null;
+
 $lot_page_data = [
     'lot' => $lot,
+    'is_yours' => $lot['author_id'] === $user_id,
     'price' => $lot['price'] ?? $lot['start_price']
 ];
 
@@ -34,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user'])) {
             'lot_id' => $lot_id
         ];
 
-        $max_bet = save_bet($link, $bet, $lot_id);
+        save_bet($link, $bet);
+        $max_bet = get_max_bet($link, $lot_id);
         $lot_page_data['price'] = $max_bet;
     }
 }
@@ -56,7 +61,7 @@ $title = $lot === null
 $layout = include_template('layout.php', [
     'title' => $title,
     'content' => $content,
-    'categories' => $categories
+    'categories' => $full_categories
 ]);
 
 print($layout);

@@ -40,18 +40,6 @@ function format_price(float $price): string {
 }
 
 /**
- * Returns hours and minutes till midnight in HH:mm format
- *
- * @return string
- */
-function get_time_till_midnight(): string {
-    $now_date = date_create();
-    $tomorrow_midnight_date = date_create('tomorrow midnight');
-
-    return date_interval_format(date_diff($now_date, $tomorrow_midnight_date), '%H:%I');
-}
-
-/**
  * Returns null if the date's in the past or returns days, hours and minutes till a given date
  *
  * @param string $end_date
@@ -75,11 +63,94 @@ function get_time_till_date(string $end_date): ?string {
  *
  * @return string
  */
-function get_time_time_from_now(string $date): string {
+function get_human_time_from_now(string $date): string {
     $now_date = date_create();
     $end_date = date_create($date);
+    $abs_days_left = date_interval_format(date_diff($now_date, $end_date), "%a");
 
-    return date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I назад');
+    if ($abs_days_left < 1 && date_interval_format(date_diff($now_date, $end_date), "%i") < 1) {
+        return 'меньше минуты';
+    }
+
+    if ($abs_days_left >= 1) {
+        $days = (int) date_interval_format(date_diff($now_date, $end_date), '%a');
+
+        if ($days === 1) {
+            return 'день';
+        }
+
+        $test_num = $days % 100;
+
+        if ($test_num >= 5 && $test_num <= 20) {
+            return $days . ' дней';
+        }
+
+        $test_num %= 10;
+
+        if ($test_num === 1) {
+            return $days . ' день';
+        }
+
+        if ($test_num >= 2 && $test_num <= 4) {
+            return $days . ' дня';
+        }
+
+        return $days . ' дней';
+    }
+
+    if ($abs_days_left < 1 && date_interval_format(date_diff($now_date, $end_date), "%H") < 1) {
+        $minutes = (int) date_interval_format(date_diff($now_date, $end_date), '%i');
+
+        if ($minutes === 1) {
+            return 'час';
+        }
+
+        $test_num = $minutes % 100;
+
+        if ($test_num >= 5 && $test_num <= 20) {
+            return $minutes . ' минут';
+        }
+
+        $test_num %= 10;
+
+        if ($test_num === 1) {
+            return $minutes . ' минута';
+        }
+
+        if ($test_num >= 2 && $test_num <= 4) {
+            return $minutes . ' минуты';
+        }
+
+        return $minutes . ' минут';
+    }
+
+    if ($abs_days_left < 1 && date_interval_format(date_diff($now_date, $end_date), "%H") < 24) {
+        $hours = (int) date_interval_format(date_diff($now_date, $end_date), '%h');
+
+        if ($hours === 1) {
+            return 'час';
+        }
+
+        $test_num = $hours % 100;
+
+        if ($test_num >= 5 && $test_num <= 20) {
+            return $hours . ' часов';
+        }
+
+        $test_num %= 10;
+
+        if ($test_num === 1) {
+            return $hours . ' час';
+        }
+
+        if ($test_num >= 2 && $test_num <= 4) {
+            return $hours . ' часа';
+        }
+
+        return $hours . ' часов';
+    }
+
+    return date_interval_format(date_diff($now_date, $end_date), '%dд. %H:%I');
 }
 
 /**
@@ -337,7 +408,7 @@ function validate_files_data(array $scheme): array {
     $found_errors = [];
 
     foreach ($scheme as $form_name => $tests) {
-        $is_value_optional = !does_file_exist($form_name) && !in_array('does_file_exist', $tests, true);
+        $is_value_optional = !does_file_exist($form_name) && !in_array('does_file_exist', array_keys($tests), true);
 
         if ($is_value_optional) {
             continue;

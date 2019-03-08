@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $lot_id = save_lot($link, $lot);
 
-        header('Location: /?lot=' . $lot_id);
+        header('Location: /lot.php?lot=' . $lot_id);
     }
 }
 
@@ -48,7 +48,7 @@ $content = include_template('add.php', [
 $layout = include_template('layout.php', [
     'title' => 'Добавить лот',
     'content' => $content,
-    'categories' => $categories
+    'categories' => $full_categories
 ]);
 
 print($layout);

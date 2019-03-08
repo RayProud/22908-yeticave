@@ -26,7 +26,7 @@ $content = include_template('login.php', [
 $layout = include_template('layout.php', [
     'title' => 'Войти',
     'content' => $content,
-    'categories' => $categories
+    'categories' => $full_categories
 ]);
 
 print($layout);

@@ -4,15 +4,14 @@ require_once('./init.php');
 $lots = get_all_lots($link) ?? [];
 
 $content = include_template('index.php', [
-    'categories' => $categories,
-    'lots' => $lots,
-    'timer' => get_time_till_midnight()
+    'categories' => $full_categories,
+    'lots' => $lots
 ]);
 
 $layout = include_template('layout.php', [
     'title' => 'Главная',
     'content' => $content,
-    'categories' => $categories
+    'categories' => $full_categories
 ]);
 
 print($layout);
