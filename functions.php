@@ -162,7 +162,7 @@ function get_human_time_from_now(string $date): string {
  */
 function not_null($value): bool {
     if (is_string($value)) {
-        $new_value = trim($value, " \t\n\r\"");
+        $new_value = trim($value, " \t\n\r");
         return $new_value !== '';
     }
 
@@ -245,6 +245,10 @@ function has_correct_mime_type(string $photo_field_name): bool {
  * @return bool
  */
 function is_email_like($value): bool {
+    if (is_string($value)) {
+        $value = trim($value, " \t\n\r");
+    }
+
     return filter_var($value, FILTER_VALIDATE_EMAIL);
 }
 
@@ -256,6 +260,10 @@ function is_email_like($value): bool {
  * @return bool
  */
 function is_email_unique($value): bool {
+    if (is_string($value)) {
+        $value = trim($value, " \t\n\r");
+    }
+
     return !does_such_email_already_exist($GLOBALS['link'], $value);
 }
 
@@ -267,6 +275,10 @@ function is_email_unique($value): bool {
  * @return bool
  */
 function does_email_exist($value): bool {
+    if (is_string($value)) {
+        $value = trim($value, " \t\n\r");
+    }
+
     return does_such_email_already_exist($GLOBALS['link'], $value);
 }
 
@@ -381,7 +393,6 @@ function validate_login(): array {
     $user_post_rules = [
         'email' => [
             'not_null' => 'Введите e-mail',
-            'does_email_exist' => 'Пользователю с таким e-mail не существует',
             'is_email_like' => 'Введите корректный email'
         ],
         'password' => [
@@ -393,10 +404,12 @@ function validate_login(): array {
         return validate_post_data($user_post_rules);
     }
 
-    $found_pass = get_hashed_password_by_email($GLOBALS['link'], $_POST['email']);
+    $trimmed_email = trim($_POST['email'], " \t\n\r");
 
-    if(!password_verify($_POST['password'], $found_pass)) {
-        return ['password' => 'Вы ввели неверный пароль'];
+    $found_pass = get_hashed_password_by_email($GLOBALS['link'], $trimmed_email);
+
+    if(!password_verify($_POST['password'], $found_pass) || !does_email_exist($trimmed_email)) {
+        return ['incorrect_data' => 'Вы ввели неверный email/пароль'];
     }
 
     return [];

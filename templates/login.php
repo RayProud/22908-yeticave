@@ -1,5 +1,9 @@
 <form class="form container <?php if ($have_errors): ?>form--invalid<?php endif; ?>" action="/login.php" method="post">
     <h2>Вход</h2>
+
+    <span class="form__error--main">
+        <?= $found_errors['incorrect_data'] ?? '' ?>
+    </span>
     <div class="form__item <?php if (isset($found_errors['email'])): ?>form__item--invalid<?php endif; ?>"> <!-- form__item--invalid -->
         <label for="email">E-mail*</label>
         <input id="email" type="text" name="email" placeholder="Введите e-mail" value="<?=htmlspecialchars($email)?>" required>
