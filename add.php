@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
 
 $found_errors = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user'])) {
     $found_errors = validate_lot();
 
     if (!count($found_errors)) {
@@ -21,13 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'start_price' => $_POST['lot-rate'],
             'end_at' => $_POST['lot-date'],
             'bet_step' => $_POST['lot-step'],
-            'author_id' => 1,
+            'author_id' => $_SESSION['user']['id'],
             'category_id' => $_POST['category']
         ];
 
         $lot_id = save_lot($link, $lot);
 
         header('Location: /lot.php?lot=' . $lot_id);
+        exit();
     }
 }
 

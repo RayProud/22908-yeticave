@@ -19,11 +19,10 @@ $lot_id = (int) $_GET['lot'];
 $lot = get_lot($link, $lot_id);
 
 $user_id = $_SESSION['user']['id'] ?? null;
-
 $lot_page_data = [
     'lot' => $lot,
-    'is_yours' => $lot['author_id'] === $user_id,
-    'price' => $lot['price'] ?? $lot['start_price']
+    'price' => $lot['price'] ?? $lot['start_price'],
+    'show_bidding' => isset($_SESSION['user']) && $lot['author_id'] !== $user_id && get_time_till_date($lot["end_at"]) !== null
 ];
 
 $found_errors = [];
@@ -45,6 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user'])) {
 }
 
 $bets = get_bets($link, $lot_id) ?? [];
+
+foreach ($bets as $bet) {
+    if ($bet['author_id'] === $user_id) {
+        $lot_page_data['show_bidding'] = FALSE;
+    }
+}
+
 $max_bet = $bets ? max(array_column($bets, 'amount')) : null;
 
 $lot_page_data['bets'] = $bets ?? [];

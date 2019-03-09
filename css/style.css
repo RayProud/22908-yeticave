@@ -848,6 +848,13 @@ main.container {
   background: #ffffff url("../img/date.svg") 326px 12px no-repeat;
 }
 
+.form__error--main {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #f84646;
+}
+
 .form__error {
   display: none;
   font-size: 11px;

@@ -158,7 +158,7 @@ function get_lot($link, int $lot_id): ?array {
  * @return array|null
  */
 function get_bets($link, int $lot_id): ?array {
-    $get_bets_query = 'SELECT b.created_at, b.amount, u.name
+    $get_bets_query = 'SELECT b.created_at, b.amount, u.name, b.author_id
         FROM lot l
                JOIN bet b
                     ON b.lot_id=l.id
@@ -303,7 +303,7 @@ function get_hashed_password_by_email($link, string $email): ?string {
 
     $response = execute_get_statement($link, $find_email_query, [$email]);
 
-    return $response[0]['password'] ?? $response;
+    return $response[0]['password'] ?? null;
 }
 
 /**

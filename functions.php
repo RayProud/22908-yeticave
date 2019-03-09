@@ -57,6 +57,30 @@ function get_time_till_date(string $end_date): ?string {
 }
 
 /**
+ * Returns null if the date's in the past or returns only hours and minutes till a given date
+ *
+ * @param string $end_date
+ *
+ * @return string|null
+ */
+function get_time_till_date_in_hours_and_minutes(string $end_date): ?string {
+    $now_date = date_create();
+    $end_date = date_create($end_date);
+
+    if ($now_date > $end_date) {
+        return null;
+    }
+
+    $hours = date_interval_format(date_diff($now_date, $end_date), '%h');
+    $days = date_interval_format(date_diff($now_date, $end_date), '%a');
+    $minutes = date_interval_format(date_diff($now_date, $end_date), '%I');
+    $total_hours = $hours + ($days * 24);
+    $total_hours = $total_hours < 10 ? "0" . $total_hours : $total_hours;
+
+    return $total_hours . ":" . $minutes;
+}
+
+/**
  * Returns human format time from now
  *
  * @param string $date
@@ -161,6 +185,11 @@ function get_human_time_from_now(string $date): string {
  * @return bool
  */
 function not_null($value): bool {
+    if (is_string($value)) {
+        $new_value = trim_if_string($value);
+        return $new_value !== '';
+    }
+
     return $value !== null && !empty($value);
 }
 
@@ -225,11 +254,22 @@ function does_file_exist(string $photo_field_name): bool {
 function has_correct_mime_type(string $photo_field_name): bool {
     $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
 
-    if (!isset($_FILES[$photo_field_name])) {
+    if (!isset($_FILES[$photo_field_name]) || !not_null($_FILES[$photo_field_name]['tmp_name'])) {
         return false;
     }
 
-    return in_array($_FILES[$photo_field_name]['type'], $allowed_image_types, true);
+    return in_array(mime_content_type($_FILES[$photo_field_name]['tmp_name']), $allowed_image_types, true);
+}
+
+/**
+ * Returns trimmed string if it was a string or a given value
+ *
+ * @param $value
+ *
+ * @return any
+ */
+function trim_if_string($value) {
+    return is_string($value) ? trim($value, " \t\n\r") : $value;
 }
 
 /**
@@ -240,7 +280,7 @@ function has_correct_mime_type(string $photo_field_name): bool {
  * @return bool
  */
 function is_email_like($value): bool {
-    return filter_var($value, FILTER_VALIDATE_EMAIL);
+    return filter_var(trim_if_string($value), FILTER_VALIDATE_EMAIL);
 }
 
 /**
@@ -251,7 +291,7 @@ function is_email_like($value): bool {
  * @return bool
  */
 function is_email_unique($value): bool {
-    return !does_such_email_already_exist($GLOBALS['link'], $value);
+    return !does_such_email_already_exist($GLOBALS['link'], trim_if_string($value));
 }
 
 /**
@@ -262,7 +302,7 @@ function is_email_unique($value): bool {
  * @return bool
  */
 function does_email_exist($value): bool {
-    return does_such_email_already_exist($GLOBALS['link'], $value);
+    return does_such_email_already_exist($GLOBALS['link'], trim_if_string($value));
 }
 
 /**
@@ -376,7 +416,6 @@ function validate_login(): array {
     $user_post_rules = [
         'email' => [
             'not_null' => 'Введите e-mail',
-            'does_email_exist' => 'Пользователю с таким e-mail не существует',
             'is_email_like' => 'Введите корректный email'
         ],
         'password' => [
@@ -388,10 +427,12 @@ function validate_login(): array {
         return validate_post_data($user_post_rules);
     }
 
-    $found_pass = get_hashed_password_by_email($GLOBALS['link'], $_POST['email']);
+    $trimmed_email = trim_if_string($_POST['email']);
 
-    if(!password_verify($_POST['password'], $found_pass)) {
-        return ['password' => 'Вы ввели неверный пароль'];
+    $found_pass = get_hashed_password_by_email($GLOBALS['link'], $trimmed_email);
+
+    if(!password_verify($_POST['password'], $found_pass) || !does_email_exist($trimmed_email)) {
+        return ['incorrect_data' => 'Вы ввели неверный email/пароль'];
     }
 
     return [];
@@ -445,7 +486,7 @@ function validate_post_data(array $scheme): array {
     foreach ($scheme as $form_name => $tests) {
         $current_value = $_POST[$form_name] ?? null;
 
-        $is_value_optional = !not_null($current_value) && !in_array('not_null', $tests, true);
+        $is_value_optional = !not_null($current_value) && !in_array('not_null', array_keys($tests), true);
 
         if ($is_value_optional) {
             continue;
