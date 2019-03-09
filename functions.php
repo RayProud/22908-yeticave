@@ -57,6 +57,30 @@ function get_time_till_date(string $end_date): ?string {
 }
 
 /**
+ * Returns null if the date's in the past or returns only hours and minutes till a given date
+ *
+ * @param string $end_date
+ *
+ * @return string|null
+ */
+function get_time_till_date_in_hours_and_minutes(string $end_date): ?string {
+    $now_date = date_create();
+    $end_date = date_create($end_date);
+
+    if ($now_date > $end_date) {
+        return null;
+    }
+
+    $hours = date_interval_format(date_diff($now_date, $end_date), '%h');
+    $days = date_interval_format(date_diff($now_date, $end_date), '%a');
+    $minutes = date_interval_format(date_diff($now_date, $end_date), '%I');
+    $total_hours = $hours + ($days * 24);
+    $total_hours = $total_hours < 10 ? "0" . $total_hours : $total_hours;
+
+    return $total_hours . ":" . $minutes;
+}
+
+/**
  * Returns human format time from now
  *
  * @param string $date

@@ -16,6 +16,7 @@ if (!isset($_GET['category']) || !is_numeric($_GET['category'])) {
 }
 
 $category_id = (int) $_GET['category'];
+$category_title = "";
 
 foreach ($full_categories as $category) {
     if ($category['id'] === $category_id) {

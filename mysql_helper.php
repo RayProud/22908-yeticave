@@ -158,7 +158,7 @@ function get_lot($link, int $lot_id): ?array {
  * @return array|null
  */
 function get_bets($link, int $lot_id): ?array {
-    $get_bets_query = 'SELECT b.created_at, b.amount, u.name
+    $get_bets_query = 'SELECT b.created_at, b.amount, u.name, b.author_id
         FROM lot l
                JOIN bet b
                     ON b.lot_id=l.id
