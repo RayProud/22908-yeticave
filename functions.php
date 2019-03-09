@@ -186,7 +186,7 @@ function get_human_time_from_now(string $date): string {
  */
 function not_null($value): bool {
     if (is_string($value)) {
-        $new_value = trim($value, " \t\n\r");
+        $new_value = trim_if_string($value);
         return $new_value !== '';
     }
 
@@ -262,6 +262,17 @@ function has_correct_mime_type(string $photo_field_name): bool {
 }
 
 /**
+ * Returns trimmed string if it was a string or a given value
+ *
+ * @param $value
+ *
+ * @return any
+ */
+function trim_if_string($value) {
+    return is_string($value) ? trim($value, " \t\n\r") : $value;
+}
+
+/**
  * Checks if a value is email-like
  *
  * @param any $value
@@ -269,11 +280,7 @@ function has_correct_mime_type(string $photo_field_name): bool {
  * @return bool
  */
 function is_email_like($value): bool {
-    if (is_string($value)) {
-        $value = trim($value, " \t\n\r");
-    }
-
-    return filter_var($value, FILTER_VALIDATE_EMAIL);
+    return filter_var(trim_if_string($value), FILTER_VALIDATE_EMAIL);
 }
 
 /**
@@ -284,11 +291,7 @@ function is_email_like($value): bool {
  * @return bool
  */
 function is_email_unique($value): bool {
-    if (is_string($value)) {
-        $value = trim($value, " \t\n\r");
-    }
-
-    return !does_such_email_already_exist($GLOBALS['link'], $value);
+    return !does_such_email_already_exist($GLOBALS['link'], trim_if_string($value));
 }
 
 /**
@@ -299,11 +302,7 @@ function is_email_unique($value): bool {
  * @return bool
  */
 function does_email_exist($value): bool {
-    if (is_string($value)) {
-        $value = trim($value, " \t\n\r");
-    }
-
-    return does_such_email_already_exist($GLOBALS['link'], $value);
+    return does_such_email_already_exist($GLOBALS['link'], trim_if_string($value));
 }
 
 /**
@@ -428,7 +427,7 @@ function validate_login(): array {
         return validate_post_data($user_post_rules);
     }
 
-    $trimmed_email = trim($_POST['email'], " \t\n\r");
+    $trimmed_email = trim_if_string($_POST['email']);
 
     $found_pass = get_hashed_password_by_email($GLOBALS['link'], $trimmed_email);
 

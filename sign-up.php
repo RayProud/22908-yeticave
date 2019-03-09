@@ -9,7 +9,7 @@ if (isset($_SESSION['user'])) {
 
 $found_errors = [];
 
-$trimmed_email = isset($_POST['email']) ? trim($_POST['email'], " \t\n\r") : "";
+$trimmed_email = isset($_POST['email']) ? trim_if_string($_POST['email']) : "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $found_errors = validate_user();
