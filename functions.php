@@ -230,7 +230,7 @@ function does_file_exist(string $photo_field_name): bool {
 function has_correct_mime_type(string $photo_field_name): bool {
     $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
 
-    if (!isset($_FILES[$photo_field_name])) {
+    if (!isset($_FILES[$photo_field_name]) || !not_null($_FILES[$photo_field_name]['tmp_name'])) {
         return false;
     }
 
