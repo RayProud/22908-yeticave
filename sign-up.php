@@ -1,6 +1,12 @@
 <?php
 require_once('./init.php');
 
+// если юзер уже залогинен, то не надо регистрировать, а просто возвращаем на главную
+if (isset($_SESSION['user'])) {
+    header('Location: /');
+    exit();
+}
+
 $found_errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -20,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user_id = save_user($link, $user);
 
         header('Location: /login.php');
+        exit();
     }
 }
 

@@ -303,7 +303,7 @@ function get_hashed_password_by_email($link, string $email): ?string {
 
     $response = execute_get_statement($link, $find_email_query, [$email]);
 
-    return $response[0]['password'] ?? $response;
+    return $response[0]['password'] ?? null;
 }
 
 /**

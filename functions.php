@@ -161,6 +161,11 @@ function get_human_time_from_now(string $date): string {
  * @return bool
  */
 function not_null($value): bool {
+    if (is_string($value)) {
+        $new_value = trim($value, " \t\n\r\"");
+        return $new_value !== '';
+    }
+
     return $value !== null && !empty($value);
 }
 
@@ -229,7 +234,7 @@ function has_correct_mime_type(string $photo_field_name): bool {
         return false;
     }
 
-    return in_array($_FILES[$photo_field_name]['type'], $allowed_image_types, true);
+    return in_array(mime_content_type($_FILES[$photo_field_name]['tmp_name']), $allowed_image_types, true);
 }
 
 /**
@@ -445,7 +450,7 @@ function validate_post_data(array $scheme): array {
     foreach ($scheme as $form_name => $tests) {
         $current_value = $_POST[$form_name] ?? null;
 
-        $is_value_optional = !not_null($current_value) && !in_array('not_null', $tests, true);
+        $is_value_optional = !not_null($current_value) && !in_array('not_null', array_keys($tests), true);
 
         if ($is_value_optional) {
             continue;
