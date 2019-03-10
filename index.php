@@ -9,6 +9,7 @@ $content = include_template('index.php', [
 ]);
 
 $layout = include_template('layout.php', [
+    'page' => 'index',
     'title' => 'Главная',
     'content' => $content,
     'categories' => $full_categories

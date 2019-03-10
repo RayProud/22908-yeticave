@@ -1,3 +1,13 @@
+<nav class="nav">
+    <ul class="nav__list container">
+        <?php foreach ($categories as $category): ?>
+            <li class="nav__item">
+                <a href="/all-lots.php?category=<?=$category['id']; ?>"><?=$category['title']; ?></a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</nav>
+
 <form class="form container <?php if ($have_errors): ?>form--invalid<?php endif; ?>" action="/login.php" method="post">
     <h2>Вход</h2>
 

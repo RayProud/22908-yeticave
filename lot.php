@@ -2,7 +2,9 @@
 require_once('./init.php');
 
 if (!isset($_GET['lot']) || !is_numeric($_GET['lot'])) {
-    $content = include_template('404.php');
+    $content = include_template('404.php', [
+        'categories' => $full_categories
+    ]);
     $title = 'Нет такой страницы';
 
     $layout = include_template('layout.php', [
@@ -22,7 +24,8 @@ $user_id = $_SESSION['user']['id'] ?? null;
 $lot_page_data = [
     'lot' => $lot,
     'price' => $lot['price'] ?? $lot['start_price'],
-    'show_bidding' => isset($_SESSION['user']) && $lot['author_id'] !== $user_id && get_time_till_date($lot["end_at"]) !== null
+    'show_bidding' => isset($_SESSION['user']) && $lot['author_id'] !== $user_id && get_time_till_date($lot["end_at"]) !== null,
+    'categories' => $full_categories
 ];
 
 $found_errors = [];
@@ -57,7 +60,7 @@ $lot_page_data['bets'] = $bets ?? [];
 $lot_page_data['found_errors'] = $found_errors ?? [];
 
 $content = $lot === null
-    ? include_template('404.php')
+    ? include_template('404.php', ['categories' => $full_categories])
     : include_template('lot.php', $lot_page_data);
 
 $title = $lot === null

@@ -1,3 +1,13 @@
+<nav class="nav">
+    <ul class="nav__list container">
+        <?php foreach ($categories as $category): ?>
+            <li class="nav__item">
+                <a href="/all-lots.php?category=<?=$category['id']; ?>"><?=$category['title']; ?></a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</nav>
+
 <form class="form form--add-lot container <?php if ($have_errors): ?>form--invalid<?php endif; ?>" enctype="multipart/form-data" action="/add.php" method="post"> <!-- form--invalid -->
     <h2>Добавление лота</h2>
     <div class="form__container-two">
@@ -14,7 +24,7 @@
                 <option disabled>Выберите категорию</option>
 
                 <?php foreach ($categories as $category): ?>
-                    <option value="<?=$category["id"] ?>" <?php if (!empty($lot_category) && $lot_category == $category["id"]): ?>selected<?php endif; ?>>
+                    <option value="<?=$category["id"] ?>" <?php if (!empty($lot_category) && $lot_category === $category["id"]): ?>selected<?php endif; ?>>
                         <?=$category["title"]; ?>
                     </option>
                 <?php endforeach; ?>

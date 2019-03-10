@@ -1,3 +1,13 @@
+<nav class="nav">
+    <ul class="nav__list container">
+        <?php foreach ($categories as $category): ?>
+            <li class="nav__item">
+                <a href="/all-lots.php?category=<?=$category['id']; ?>"><?=$category['title']; ?></a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</nav>
+
 <section class="lot-item container">
       <h2><?=htmlspecialchars($lot["title"]); ?></h2>
       <div class="lot-item__content">
