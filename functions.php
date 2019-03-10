@@ -184,7 +184,7 @@ function get_human_time_from_now(string $date): string {
  *
  * @return bool
  */
-function not_null($value): bool {
+function has_data($value): bool {
     if (is_string($value)) {
         $new_value = trim_if_string($value);
         return $new_value !== '';
@@ -254,7 +254,7 @@ function does_file_exist(string $photo_field_name): bool {
 function has_correct_mime_type(string $photo_field_name): bool {
     $allowed_image_types = ['image/jpg', 'image/jpeg', 'image/png'];
 
-    if (!isset($_FILES[$photo_field_name]) || !not_null($_FILES[$photo_field_name]['tmp_name'])) {
+    if (!isset($_FILES[$photo_field_name]) || !has_data($_FILES[$photo_field_name]['tmp_name'])) {
         return false;
     }
 
@@ -315,7 +315,7 @@ function does_email_exist($value): bool {
 function validate_bet(array $lot): array {
     $bet_post_rules = [
         'cost' => [
-            'not_null' => 'Введите ставку',
+            'has_data' => 'Введите ставку',
             'is_positive_int' => 'Ставка должна быть целым положительным числом'
         ]
     ];
@@ -343,24 +343,24 @@ function validate_bet(array $lot): array {
 function validate_lot(): array {
     $lot_post_rules = [
         'lot-name' => [
-            'not_null' => 'Введите наименование лота'
+            'has_data' => 'Введите наименование лота'
         ],
         'category' => [
-            'not_null' => 'Выберите категорию'
+            'has_data' => 'Выберите категорию'
         ],
         'message' => [
-            'not_null' => 'Напишите описание лота'
+            'has_data' => 'Напишите описание лота'
         ],
         'lot-rate' => [
-            'not_null' => 'Введите начальную цену',
+            'has_data' => 'Введите начальную цену',
             'is_positive_number' => 'Начальная цена должна быть числом больше нуля',
         ],
         'lot-step' => [
-            'not_null' => 'Введите шаг ставки',
+            'has_data' => 'Введите шаг ставки',
             'is_positive_int' => 'Шаг ставки должен быть целым числом больше ноля',
         ],
         'lot-date' => [
-            'not_null' => 'Введите дату завершения торгов',
+            'has_data' => 'Введите дату завершения торгов',
             'is_date_correct_and_later_than_current_day' => 'Дата завершения должна быть больше текущей даты, хотя бы на один день',
         ]
     ];
@@ -383,18 +383,18 @@ function validate_lot(): array {
 function validate_user(): array {
     $user_post_rules = [
         'name' => [
-            'not_null' => 'Введите имя'
+            'has_data' => 'Введите имя'
         ],
         'email' => [
-            'not_null' => 'Введите e-mail',
+            'has_data' => 'Введите e-mail',
             'is_email_unique' => 'Пользователь с таким e-mail уже существует',
             'is_email_like' => 'Введите корректный email'
         ],
         'password' => [
-            'not_null' => 'Введите пароль'
+            'has_data' => 'Введите пароль'
         ],
         'contacts' => [
-            'not_null' => 'Напишите как с вами связаться'
+            'has_data' => 'Напишите как с вами связаться'
         ]
     ];
 
@@ -415,11 +415,11 @@ function validate_user(): array {
 function validate_login(): array {
     $user_post_rules = [
         'email' => [
-            'not_null' => 'Введите e-mail',
+            'has_data' => 'Введите e-mail',
             'is_email_like' => 'Введите корректный email'
         ],
         'password' => [
-            'not_null' => 'Введите пароль'
+            'has_data' => 'Введите пароль'
         ]
     ];
 
@@ -486,7 +486,7 @@ function validate_post_data(array $scheme): array {
     foreach ($scheme as $form_name => $tests) {
         $current_value = $_POST[$form_name] ?? null;
 
-        $is_value_optional = !not_null($current_value) && !in_array('not_null', array_keys($tests), true);
+        $is_value_optional = !has_data($current_value) && !in_array('has_data', array_keys($tests), true);
 
         if ($is_value_optional) {
             continue;

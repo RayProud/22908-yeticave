@@ -35,7 +35,7 @@
                   </div>
                 </div>
                 <?php if($show_bidding): ?>
-                    <form class="$bets-item__form" action="/lot.php?lot=<?=$lot["id"]; ?>" method="post">
+                    <form class="lot-item__form" action="/lot.php?lot=<?=$lot["id"]; ?>" method="post">
                         <p class="lot-item__form-item form__item <?php if (isset($found_errors['cost'])): ?>form__item--invalid<?php endif; ?>">
                             <label for="cost">Ваша ставка</label>
                             <input id="cost" type="text" name="cost" placeholder="<?=$price + $lot["bet_step"]; ?>">
